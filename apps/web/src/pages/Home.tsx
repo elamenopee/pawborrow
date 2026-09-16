@@ -6,6 +6,7 @@ import FAQS from "@/components/ui/Faq";
 import "@/styles/Home.css";
 import "@/styles/Button.css";
 import { MapPin, CalendarDays, PawPrint } from "lucide-react";
+import { usePets } from "@repo/api";
 
 type PawTileProps = {
   tone?: "coral" | "peach" | "sage" | "sand" | "ink";
@@ -55,28 +56,24 @@ const TONES: Record<string, { bg: string; paw: string }> = {
 const CATEGORIES = [
   {
     name: "Cats",
-    count: "10 companions",
     tone: "coral" as const,
     image: "/images/category-cats.jpg",
     filterCategory: "Cat",
   },
   {
     name: "Dogs",
-    count: "9 companions",
     tone: "peach" as const,
     image: "/images/category-dogs.jpg",
     filterCategory: "Dog",
   },
   {
-    name: "Guinea Pigs",
-    count: "10 companions",
+    name: "Capybaras",
     tone: "sage" as const,
-    image: "/images/category-guinea-pigs.jpg",
-    filterCategory: "Guinea Pig",
+    image: "/images/pets/Capybara/Great/Coco.jpg",
+    filterCategory: "Capybara",
   },
   {
     name: "Rabbits",
-    count: "3 companions",
     tone: "sand" as const,
     image: "/images/category-rabbits.jpg",
     filterCategory: "Rabbit",
@@ -153,34 +150,78 @@ function Hero() {
 }
 
 function Categories() {
+  const {
+    data: pets = [],
+    isLoading,
+    error,
+  } = usePets();
+
   return (
-    <section id="browse" className="section categories">
+    <section
+      id="browse"
+      className="section categories"
+    >
       <div className="section__head">
         <h2>Browse by companion</h2>
       </div>
 
+      {error && (
+        <p className="mb-4 text-sm text-red-500">
+          {error instanceof Error
+            ? error.message
+            : "Failed to load pet counts."}
+        </p>
+      )}
+
       <div className="categories__grid">
-        {CATEGORIES.map((c) => (
-          <Link
-            to={`/pets?category=${encodeURIComponent(c.filterCategory)}`}
-            className="category-card"
-            key={c.name}
-          >
-            <PhotoTile
-              src={c.image}
-              alt={c.name}
-              tone={c.tone}
-              className="category-card__image"
-            />
-            <div className="category-card__meta">
-              <div>
-                <h3>{c.name}</h3>
-                <p>{c.count}</p>
+        {CATEGORIES.map((category) => {
+          const count = pets.filter(
+            (pet) =>
+              pet.category?.trim().toLowerCase() ===
+              category.filterCategory
+                .trim()
+                .toLowerCase(),
+          ).length;
+
+          const countLabel = isLoading
+            ? "Loading..."
+            : `${count} ${
+                count === 1
+                  ? "companion"
+                  : "companions"
+              }`;
+
+          return (
+            <Link
+              to={`/pets?category=${encodeURIComponent(
+                category.filterCategory,
+              )}`}
+              className="category-card"
+              key={category.name}
+            >
+              <PhotoTile
+                src={category.image}
+                alt={category.name}
+                tone={category.tone}
+                className="category-card__image"
+              />
+
+              <div className="category-card__meta">
+                <div>
+                  <h3>{category.name}</h3>
+                  <p>{countLabel}</p>
+                </div>
+
+                <span
+                  className="category-card__arrow"
+                  aria-hidden="true"
+                >
+                  →
+                </span>
               </div>
-              <span className="category-card__arrow">→</span>
-            </div>
-          </Link>
-        ))}
+            </Link>
+          );
+        })}
       </div>
     </section>
   );

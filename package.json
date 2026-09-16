@@ -12,6 +12,12 @@
   "devDependencies": {
     "turbo": "^2.3.3"
   },
+  "pnpm": {
+    "overrides": {
+      "@types/react": "19.0.10",
+      "@types/react-dom": "19.0.4"
+    }
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/tonytoes/pawborrow.git"

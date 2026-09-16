@@ -127,3 +127,104 @@
   color: #6b7280;
   font-size: 14px;
 }
+.liked-pets-loading,
+.liked-pets-error {
+  padding: 24px;
+  text-align: center;
+}
+
+.liked-pets-error {
+  color: #dc2626;
+}
+
+.liked-pet-item {
+  position: relative;
+  overflow: hidden;
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow: 0 5px 18px
+    rgba(15, 23, 42, 0.08);
+}
+
+.liked-pet-main {
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+}
+
+.liked-pet-image-wrap {
+  position: relative;
+  width: 100%;
+}
+
+.liked-pet-image-wrap img {
+  display: block;
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+}
+
+.liked-pet-status {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.liked-pet-status--available {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.liked-pet-status--unavailable {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.liked-pet-name,
+.liked-pet-breed {
+  display: block;
+  padding-right: 12px;
+  padding-left: 12px;
+}
+
+.liked-pet-name {
+  padding-top: 12px;
+  color: #111827;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.liked-pet-breed {
+  padding-top: 4px;
+  padding-bottom: 12px;
+  color: #6b7280;
+  font-size: 12px;
+}
+
+.liked-pet-remove {
+  width: calc(100% - 24px);
+  margin: 0 12px 12px;
+  padding: 9px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 0;
+  border-radius: 10px;
+  background: #fff1f2;
+  color: #ef4444;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.liked-pet-remove:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}

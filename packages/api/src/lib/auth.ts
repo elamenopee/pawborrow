@@ -1,10 +1,18 @@
 import { supabase } from "./supabaseClient";
 
-export async function signIn(email: string, password: string) {
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email,
-    password,
-  });
+function getRedirectUrl(path = "/dashboard"): string {
+  return `${window.location.origin}${path}`;
+}
+
+export async function signIn(
+  email: string,
+  password: string,
+) {
+  const { data, error } =
+    await supabase.auth.signInWithPassword({
+      email: email.trim(),
+      password,
+    });
 
   if (error) {
     throw error;
@@ -13,14 +21,18 @@ export async function signIn(email: string, password: string) {
   return data;
 }
 
-export async function signInWithEmail(email: string) {
-  const { data, error } = await supabase.auth.signInWithOtp({
-    email,
-    options: {
-      shouldCreateUser: false,
-      emailRedirectTo: window.location.origin,
-    },
-  });
+export async function signInWithEmail(
+  email: string,
+) {
+  const { data, error } =
+    await supabase.auth.signInWithOtp({
+      email: email.trim(),
+      options: {
+        shouldCreateUser: false,
+        emailRedirectTo:
+          getRedirectUrl("/dashboard"),
+      },
+    });
 
   if (error) {
     throw error;
@@ -30,12 +42,18 @@ export async function signInWithEmail(email: string) {
 }
 
 export async function signInWithGoogle() {
-  const { data, error } = await supabase.auth.signInWithOAuth({
-    provider: "google",
-    options: {
-      redirectTo: window.location.origin,
-    },
-  });
+  const { data, error } =
+    await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo:
+          getRedirectUrl("/dashboard"),
+        queryParams: {
+          access_type: "offline",
+          prompt: "select_account",
+        },
+      },
+    });
 
   if (error) {
     throw error;
@@ -47,19 +65,24 @@ export async function signInWithGoogle() {
 export async function signUp(
   email: string,
   password: string,
-  first_name: string,
-  last_name: string
+  firstName: string,
+  lastName: string,
 ) {
-  const { data, error } = await supabase.auth.signUp({
-    email,
-    password,
-    options: {
-      data: {
-        first_name,
-        last_name,
+  const { data, error } =
+    await supabase.auth.signUp({
+      email: email.trim(),
+      password,
+      options: {
+        data: {
+          first_name: firstName.trim(),
+          last_name: lastName.trim(),
+          full_name:
+            `${firstName.trim()} ${lastName.trim()}`,
+        },
+        emailRedirectTo:
+          getRedirectUrl("/dashboard"),
       },
-    },
-  });
+    });
 
   if (error) {
     throw error;
@@ -69,7 +92,8 @@ export async function signUp(
 }
 
 export async function signOut() {
-  const { error } = await supabase.auth.signOut();
+  const { error } =
+    await supabase.auth.signOut();
 
   if (error) {
     throw error;

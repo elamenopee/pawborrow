@@ -1,41 +1,66 @@
 import {
+  useMemo,
+  useState,
+  type MouseEvent,
+} from "react";
+import {
   useNavigate,
   useParams,
 } from "react-router-dom";
-
 import {
   IonContent,
-  IonPage,
   IonIcon,
+  IonPage,
 } from "@ionic/react";
-
 import {
   chevronBackOutline,
   heart,
   heartOutline,
 } from "ionicons/icons";
-
-import { useEffect, useState } from "react";
-
-import { animalBreeds } from "../data/breeds";
-import { pets } from "../data/pets";
+import {
+  useAddLikedPet,
+  useLikedPets,
+  usePets,
+  useRemoveLikedPet,
+} from "@repo/api";
 
 import SearchBar from "../components/SearchBar";
-
-import { matchesSearch } from "../assets/images/utils/search";
-
+import { useAuth } from "../context/AuthContext";
 import {
-  useAuth,
-  getUserScopedStorageKey,
-} from "../context/AuthContext";
-
+  matchesSearch,
+} from "../utils/search";
+import {
+  getPetImage,
+  handlePetImageError,
+} from "../utils/petImage";
 import "../style/BreedPets.css";
 
-const BreedPets = () => {
-  /* =====================================
-     ROUTER
-  ===================================== */
+function createSlug(
+  value: string,
+): string {
+  return value
+    .trim()
+    .toLowerCase()
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
 
+function formatLabel(
+  value: string,
+): string {
+  return value
+    .split("-")
+    .filter(Boolean)
+    .map(
+      (word) =>
+        word.charAt(0).toUpperCase() +
+        word.slice(1),
+    )
+    .join(" ");
+}
+
+const BreedPets: React.FC = () => {
   const {
     animalId,
     breedId,
@@ -45,141 +70,146 @@ const BreedPets = () => {
   }>();
 
   const navigate = useNavigate();
-
-  /* =====================================
-     AUTH
-  ===================================== */
-
   const { user } = useAuth();
-
-  /* =====================================
-     USER-SCOPED STORAGE
-  ===================================== */
-
-  const likedPetsStorageKey =
-    getUserScopedStorageKey(
-      "pawborrow-liked-pets",
-      user?.email
-    );
-
-  /* =====================================
-     STATE
-  ===================================== */
 
   const [searchTerm, setSearchTerm] =
     useState("");
 
-  const [likedPetIds, setLikedPetIds] =
-    useState<string[]>([]);
+  const {
+    data: pets = [],
+    isLoading: petsLoading,
+    isError: petsError,
+    error: petsErrorDetails,
+    refetch: refetchPets,
+  } = usePets();
 
-  /* =====================================
-     LOAD LIKED PETS
-  ===================================== */
+  const {
+    data: likedPets = [],
+    isLoading: likedPetsLoading,
+    isError: likedPetsError,
+  } = useLikedPets(Boolean(user));
 
-  useEffect(() => {
-    try {
-      const stored =
-        localStorage.getItem(
-          likedPetsStorageKey
-        );
+  const {
+    mutate: addLikedPet,
+    isPending: isAddingLikedPet,
+  } = useAddLikedPet();
 
-      setLikedPetIds(
-        stored
-          ? JSON.parse(stored)
-          : []
-      );
-    } catch {
-      setLikedPetIds([]);
-    }
-  }, [likedPetsStorageKey]);
+  const {
+    mutate: removeLikedPet,
+    isPending: isRemovingLikedPet,
+  } = useRemoveLikedPet();
 
-  /* =====================================
-     SAVE LIKED PETS
-  ===================================== */
-
-  useEffect(() => {
-    localStorage.setItem(
-      likedPetsStorageKey,
-      JSON.stringify(likedPetIds)
+  const likedPetIds = useMemo(() => {
+    return new Set(
+      likedPets.map((likedPet) =>
+        Number(likedPet.pet_id),
+      ),
     );
+  }, [likedPets]);
+
+  const breedPets = useMemo(() => {
+    if (!animalId || !breedId) {
+      return [];
+    }
+
+    return pets.filter((pet) => {
+      const categoryMatches =
+        createSlug(pet.category) ===
+        animalId;
+
+      const breedMatches =
+        createSlug(
+          pet.breed ?? "",
+        ) === breedId;
+
+      return (
+        categoryMatches &&
+        breedMatches
+      );
+    });
   }, [
-    likedPetIds,
-    likedPetsStorageKey,
+    pets,
+    animalId,
+    breedId,
   ]);
 
-  /* =====================================
-     FIND CATEGORY
-  ===================================== */
-
-  const category =
-    animalBreeds.find(
-      (category) =>
-        category.id === animalId
-    );
-
-  /* =====================================
-     FIND BREED
-  ===================================== */
-
-  const breed =
-    category?.breeds.find(
-      (breed) =>
-        breed.id === breedId
-    );
-
-  /* =====================================
-     GET PETS FOR BREED
-  ===================================== */
-
-  const breedPets =
-    pets.filter(
-      (pet) =>
-        pet.breedId === breedId
-    );
-
-  /* =====================================
-     SEARCH
-  ===================================== */
-
   const filteredBreedPets =
-    breedPets.filter((pet) =>
-      matchesSearch(
-        pet.name,
-        searchTerm
-      )
+    useMemo(() => {
+      return breedPets.filter((pet) =>
+        matchesSearch(
+          `${pet.name} ${
+            pet.breed ?? ""
+          }`,
+          searchTerm,
+        ),
+      );
+    }, [
+      breedPets,
+      searchTerm,
+    ]);
+
+  const isUpdatingLike =
+    isAddingLikedPet ||
+    isRemovingLikedPet;
+
+  const isLoading =
+    petsLoading ||
+    (Boolean(user) &&
+      likedPetsLoading);
+
+  const breedName =
+    breedPets[0]?.breed ??
+    formatLabel(
+      breedId ?? "pets",
     );
 
-  /* =====================================
-     TOGGLE LIKE
-  ===================================== */
-
-  const toggleLike = (
-    event: React.MouseEvent<HTMLButtonElement>,
-    petId: string
-  ) => {
-    // Prevent the card's onClick
-    // from navigating to pet details.
+  function handleToggleLike(
+    event: MouseEvent<HTMLButtonElement>,
+    petId: number,
+  ) {
     event.stopPropagation();
 
-    setLikedPetIds((current) => {
-      if (current.includes(petId)) {
-        return current.filter(
-          (id) => id !== petId
+    if (!user) {
+      navigate("/login");
+      return;
+    }
+
+    if (isUpdatingLike) {
+      return;
+    }
+
+    if (likedPetIds.has(petId)) {
+      removeLikedPet(petId, {
+        onError: (error) => {
+          console.error(
+            "Failed to unlike pet:",
+            error,
+          );
+        },
+      });
+
+      return;
+    }
+
+    addLikedPet(petId, {
+      onError: (error) => {
+        console.error(
+          "Failed to like pet:",
+          error,
         );
-      }
-
-      return [
-        ...current,
-        petId,
-      ];
+      },
     });
-  };
+  }
 
-  /* =====================================
-     BREED NOT FOUND
-  ===================================== */
+  function handleOpenPet(
+    petId: number,
+  ) {
+    navigate(
+      `/dashboard/pet/${petId}`,
+    );
+  }
 
-  if (!breed) {
+  if (petsError) {
     return (
       <IonPage>
         <IonContent
@@ -188,26 +218,36 @@ const BreedPets = () => {
         >
           <div className="breed-pets-not-found">
             <p>
-              Breed not found.
+              {petsErrorDetails instanceof
+              Error
+                ? petsErrorDetails.message
+                : "Failed to load pets."}
             </p>
 
             <button
               type="button"
+              onClick={() => {
+                void refetchPets();
+              }}
+            >
+              Try Again
+            </button>
+
+            <button
+              type="button"
               onClick={() =>
-                navigate("/dashboard")
+                navigate(
+                  "/pet-category",
+                )
               }
             >
-              Back to Home
+              Back to Pets
             </button>
           </div>
         </IonContent>
       </IonPage>
     );
   }
-
-  /* =====================================
-     PAGE
-  ===================================== */
 
   return (
     <IonPage>
@@ -216,142 +256,180 @@ const BreedPets = () => {
         className="breed-pets-content"
       >
         <div className="breed-pets">
-
-          {/* =============================
-              HEADER
-          ============================= */}
-
           <header className="breed-pets-header">
-
             <button
               type="button"
               className="breed-pets-back"
               aria-label="Go back"
-              onClick={() =>
-                navigate(-1)
-              }
+              onClick={() => navigate(-1)}
             >
               <IonIcon
-                icon={
-                  chevronBackOutline
-                }
+                icon={chevronBackOutline}
               />
             </button>
 
-            <h1>
-              {breed.name}
-            </h1>
-
+            <h1>{breedName}</h1>
           </header>
-
-          {/* =============================
-              SEARCH
-          ============================= */}
 
           <SearchBar
             value={searchTerm}
             onChange={setSearchTerm}
-            placeholder="search pets..."
+            placeholder="Search pets..."
           />
 
-          {/* =============================
-              NO PETS
-          ============================= */}
-
-          {breedPets.length === 0 ? (
+          {isLoading && (
             <p className="breed-pets-empty">
-              No {breed.name} pets
-              available yet.
+              Loading pets...
             </p>
-          ) : filteredBreedPets.length ===
-            0 ? (
-            <p className="breed-pets-empty">
-              No pets found.
-            </p>
-          ) : (
-
-            /* ===========================
-               PET GRID
-            =========================== */
-
-            <div className="breed-pets-grid">
-
-              {filteredBreedPets.map(
-                (pet) => {
-
-                  const isLiked =
-                    likedPetIds.includes(
-                      pet.id
-                    );
-
-                  return (
-                    <div
-                      className="breed-pets-card"
-                      key={pet.id}
-                      onClick={() =>
-                        navigate(
-                          `/dashboard/pet/${pet.id}`
-                        )
-                      }
-                    >
-
-                      {/* =================
-                          LIKE BUTTON
-                      ================= */}
-
-                      <button
-                        type="button"
-                        className={`breed-pets-like ${
-                          isLiked
-                            ? "is-liked"
-                            : ""
-                        }`}
-                        aria-label={
-                          isLiked
-                            ? `Unlike ${pet.name}`
-                            : `Like ${pet.name}`
-                        }
-                        onClick={(event) =>
-                          toggleLike(
-                            event,
-                            pet.id
-                          )
-                        }
-                      >
-                        <IonIcon
-                          icon={
-                            isLiked
-                              ? heart
-                              : heartOutline
-                          }
-                        />
-                      </button>
-
-                      {/* =================
-                          PET IMAGE
-                      ================= */}
-
-                      <img
-                        src={pet.image}
-                        alt={pet.name}
-                      />
-
-                      {/* =================
-                          PET NAME
-                      ================= */}
-
-                      <span>
-                        {pet.name}
-                      </span>
-
-                    </div>
-                  );
-                }
-              )}
-
-            </div>
           )}
 
+          {!isLoading &&
+            likedPetsError && (
+              <p className="breed-pets-empty">
+                Failed to load liked pets.
+                You can still browse pets.
+              </p>
+            )}
+
+          {!isLoading &&
+            breedPets.length === 0 && (
+              <div className="breed-pets-not-found">
+                <p>
+                  No {breedName} pets are
+                  available yet.
+                </p>
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    navigate(
+                      `/breed-selection/${
+                        animalId ?? ""
+                      }`,
+                    )
+                  }
+                >
+                  Back to Breeds
+                </button>
+              </div>
+            )}
+
+          {!isLoading &&
+            breedPets.length > 0 &&
+            filteredBreedPets.length ===
+              0 && (
+              <p className="breed-pets-empty">
+                No pets match your search.
+              </p>
+            )}
+
+          {!isLoading &&
+            filteredBreedPets.length >
+              0 && (
+              <div className="breed-pets-grid">
+                {filteredBreedPets.map(
+                  (pet) => {
+                    const isLiked =
+                      likedPetIds.has(
+                        pet.id,
+                      );
+
+                    const status =
+                      pet.status
+                        .trim()
+                        .toLowerCase();
+
+                    return (
+                      <div
+                        className="breed-pets-card"
+                        key={pet.id}
+                        role="button"
+                        tabIndex={0}
+                        aria-label={`View ${pet.name}`}
+                        onClick={() =>
+                          handleOpenPet(
+                            pet.id,
+                          )
+                        }
+                        onKeyDown={(
+                          event,
+                        ) => {
+                          if (
+                            event.key ===
+                              "Enter" ||
+                            event.key === " "
+                          ) {
+                            event.preventDefault();
+
+                            handleOpenPet(
+                              pet.id,
+                            );
+                          }
+                        }}
+                      >
+                        <button
+                          type="button"
+                          className={`breed-pets-like ${
+                            isLiked
+                              ? "is-liked"
+                              : ""
+                          }`}
+                          aria-label={
+                            isLiked
+                              ? `Unlike ${pet.name}`
+                              : `Like ${pet.name}`
+                          }
+                          onClick={(
+                            event,
+                          ) =>
+                            handleToggleLike(
+                              event,
+                              pet.id,
+                            )
+                          }
+                          disabled={
+                            isUpdatingLike
+                          }
+                        >
+                          <IonIcon
+                            icon={
+                              isLiked
+                                ? heart
+                                : heartOutline
+                            }
+                          />
+                        </button>
+
+                        <img
+                          src={getPetImage(
+                            pet.image,
+                          )}
+                          alt={pet.name}
+                          loading="lazy"
+                          onError={
+                            handlePetImageError
+                          }
+                        />
+
+                        <span>
+                          {pet.name}
+                        </span>
+
+                        <small>
+                          {status ===
+                          "available"
+                            ? "Available"
+                            : status ===
+                                "booked"
+                              ? "Booked"
+                              : "Unavailable"}
+                        </small>
+                      </div>
+                    );
+                  },
+                )}
+              </div>
+            )}
         </div>
       </IonContent>
     </IonPage>

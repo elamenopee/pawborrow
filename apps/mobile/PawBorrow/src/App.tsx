@@ -3,6 +3,8 @@ import { IonReactRouter } from "@ionic/react-router";
 import { Navigate, Route } from "react-router-dom";
 
 import { AuthProvider } from "./context/AuthContext";
+import { BookingsProvider } from "./context/BookingsContext";
+
 import ProtectedRoute from "./router/ProtectedRoute";
 import PublicRoute from "./router/PublicRoute";
 
@@ -51,237 +53,239 @@ const App = () => {
   return (
     <IonApp>
       <AuthProvider>
-        <IonReactRouter>
-          <IonRouterOutlet>
+        <BookingsProvider>
+          <IonReactRouter>
+            <IonRouterOutlet>
 
-            {/* =========================
-                PUBLIC ROUTES
-            ========================== */}
+              {/* =========================
+                  PUBLIC ROUTES
+              ========================== */}
 
-            <Route
-              path="/login"
-              element={
-                <PublicRoute>
-                  <Login />
-                </PublicRoute>
-              }
-            />
+              <Route
+                path="/login"
+                element={
+                  <PublicRoute>
+                    <Login />
+                  </PublicRoute>
+                }
+              />
 
-            <Route
-              path="/signup"
-              element={
-                <PublicRoute>
-                  <SignUp />
-                </PublicRoute>
-              }
-            />
+              <Route
+                path="/signup"
+                element={
+                  <PublicRoute>
+                    <SignUp />
+                  </PublicRoute>
+                }
+              />
 
-            <Route
-              path="/terms-of-service"
-              element={<TermsOfService />}
-            />
+              <Route
+                path="/terms-of-service"
+                element={<TermsOfService />}
+              />
 
-            <Route
-              path="/privacy-policy"
-              element={<PrivacyPolicy />}
-            />
+              <Route
+                path="/privacy-policy"
+                element={<PrivacyPolicy />}
+              />
 
-            {/* =========================
-                PROTECTED ROUTES
-            ========================== */}
+              {/* =========================
+                  PROTECTED ROUTES
+              ========================== */}
 
-            <Route
-              path="/dashboard"
-              element={
-                <ProtectedRoute>
-                  <Dashboard />
-                </ProtectedRoute>
-              }
-            />
+              <Route
+                path="/dashboard"
+                element={
+                  <ProtectedRoute>
+                    <Dashboard />
+                  </ProtectedRoute>
+                }
+              />
 
-            <Route
-              path="/shop"
-              element={
-                <ProtectedRoute>
-                  <Shop />
-                </ProtectedRoute>
-              }
-            />
+              <Route
+                path="/shop"
+                element={
+                  <ProtectedRoute>
+                    <Shop />
+                  </ProtectedRoute>
+                }
+              />
 
-            <Route
-              path="/history"
-              element={
-                <ProtectedRoute>
-                  <History />
-                </ProtectedRoute>
-              }
-            />
+              <Route
+                path="/history"
+                element={
+                  <ProtectedRoute>
+                    <History />
+                  </ProtectedRoute>
+                }
+              />
 
-            <Route
-              path="/profile"
-              element={
-                <ProtectedRoute>
-                  <Profile />
-                </ProtectedRoute>
-              }
-            />
+              <Route
+                path="/profile"
+                element={
+                  <ProtectedRoute>
+                    <Profile />
+                  </ProtectedRoute>
+                }
+              />
 
-            <Route
-              path="/notifications"
-              element={
-                <ProtectedRoute>
-                  <Notifications />
-                </ProtectedRoute>
-              }
-            />
+              <Route
+                path="/notifications"
+                element={
+                  <ProtectedRoute>
+                    <Notifications />
+                  </ProtectedRoute>
+                }
+              />
 
-            <Route
-              path="/breed-selection"
-              element={
-                <ProtectedRoute>
-                  <BreedSelection />
-                </ProtectedRoute>
-              }
-            />
+              <Route
+                path="/breed-selection"
+                element={
+                  <ProtectedRoute>
+                    <BreedSelection />
+                  </ProtectedRoute>
+                }
+              />
 
-            <Route
-              path="/pet-category"
-              element={
-                <ProtectedRoute>
-                  <PetCategory />
-                </ProtectedRoute>
-              }
-            />
+              <Route
+                path="/pet-category"
+                element={
+                  <ProtectedRoute>
+                    <PetCategory />
+                  </ProtectedRoute>
+                }
+              />
 
-            <Route
-              path="/breed-pets"
-              element={
-                <ProtectedRoute>
-                  <BreedPets />
-                </ProtectedRoute>
-              }
-            />
+              <Route
+                path="/breed-pets"
+                element={
+                  <ProtectedRoute>
+                    <BreedPets />
+                  </ProtectedRoute>
+                }
+              />
 
-            <Route
-              path="/pet-details/:id"
-              element={
-                <ProtectedRoute>
-                  <PetDetails />
-                </ProtectedRoute>
-              }
-            />
+              <Route
+                path="/pet-details/:id"
+                element={
+                  <ProtectedRoute>
+                    <PetDetails />
+                  </ProtectedRoute>
+                }
+              />
 
-            <Route
-              path="/about-us"
-              element={
-                <ProtectedRoute>
-                  <AboutUs />
-                </ProtectedRoute>
-              }
-            />
+              <Route
+                path="/about-us"
+                element={
+                  <ProtectedRoute>
+                    <AboutUs />
+                  </ProtectedRoute>
+                }
+              />
 
-            <Route
-              path="/liked-pets"
-              element={
-                <ProtectedRoute>
-                  <LikedPets />
-                </ProtectedRoute>
-              }
-            />
+              <Route
+                path="/liked-pets"
+                element={
+                  <ProtectedRoute>
+                    <LikedPets />
+                  </ProtectedRoute>
+                }
+              />
 
-            <Route
-              path="/my-bookings"
-              element={
-                <ProtectedRoute>
-                  <MyBookings />
-                </ProtectedRoute>
-              }
-            />
+              <Route
+                path="/my-bookings"
+                element={
+                  <ProtectedRoute>
+                    <MyBookings />
+                  </ProtectedRoute>
+                }
+              />
 
-            <Route
-              path="/payment-methods"
-              element={
-                <ProtectedRoute>
-                  <PaymentMethods />
-                </ProtectedRoute>
-              }
-            />
+              <Route
+                path="/payment-methods"
+                element={
+                  <ProtectedRoute>
+                    <PaymentMethods />
+                  </ProtectedRoute>
+                }
+              />
 
-            <Route
-              path="/notification-settings"
-              element={
-                <ProtectedRoute>
-                  <NotificationSettings />
-                </ProtectedRoute>
-              }
-            />
+              <Route
+                path="/notification-settings"
+                element={
+                  <ProtectedRoute>
+                    <NotificationSettings />
+                  </ProtectedRoute>
+                }
+              />
 
-            <Route
-              path="/app-settings"
-              element={
-                <ProtectedRoute>
-                  <AppSettings />
-                </ProtectedRoute>
-              }
-            />
+              <Route
+                path="/app-settings"
+                element={
+                  <ProtectedRoute>
+                    <AppSettings />
+                  </ProtectedRoute>
+                }
+              />
 
-            <Route
-              path="/booking-confirmation"
-              element={
-                <ProtectedRoute>
-                  <BookingConfirmation />
-                </ProtectedRoute>
-              }
-            />
+              <Route
+                path="/booking-confirmation"
+                element={
+                  <ProtectedRoute>
+                    <BookingConfirmation />
+                  </ProtectedRoute>
+                }
+              />
 
-            <Route
-              path="/booking-review"
-              element={
-                <ProtectedRoute>
-                  <BookingReview />
-                </ProtectedRoute>
-              }
-            />
+              <Route
+                path="/booking-review"
+                element={
+                  <ProtectedRoute>
+                    <BookingReview />
+                  </ProtectedRoute>
+                }
+              />
 
-            <Route
-              path="/cart"
-              element={
-                <ProtectedRoute>
-                  <Cart />
-                </ProtectedRoute>
-              }
-            />
+              <Route
+                path="/cart"
+                element={
+                  <ProtectedRoute>
+                    <Cart />
+                  </ProtectedRoute>
+                }
+              />
 
-            {/* =========================
-                DEFAULT ROUTE
-            ========================== */}
+              {/* =========================
+                  DEFAULT ROUTE
+              ========================== */}
 
-            <Route
-              path="/"
-              element={
-                <Navigate
-                  to="/dashboard"
-                  replace
-                />
-              }
-            />
+              <Route
+                path="/"
+                element={
+                  <Navigate
+                    to="/dashboard"
+                    replace
+                  />
+                }
+              />
 
-            {/* =========================
-                UNKNOWN ROUTES
-            ========================== */}
+              {/* =========================
+                  UNKNOWN ROUTES
+              ========================== */}
 
-            <Route
-              path="*"
-              element={
-                <Navigate
-                  to="/dashboard"
-                  replace
-                />
-              }
-            />
+              <Route
+                path="*"
+                element={
+                  <Navigate
+                    to="/dashboard"
+                    replace
+                  />
+                }
+              />
 
-          </IonRouterOutlet>
-        </IonReactRouter>
+            </IonRouterOutlet>
+          </IonReactRouter>
+        </BookingsProvider>
       </AuthProvider>
     </IonApp>
   );

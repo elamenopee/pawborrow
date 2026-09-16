@@ -236,3 +236,46 @@
 .booking-review-btn:hover {
   background: #e05a5a;
 }
+.liked-card__image {
+  position: relative;
+}
+
+.liked-card__status {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  z-index: 2;
+}
+
+.liked-card__status--available {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.liked-card__status--booked {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.liked-card--booked .liked-card__image img {
+  opacity: 0.65;
+}
+
+.btn--book-again:disabled {
+  cursor: not-allowed;
+  background: #d1d5db;
+  color: #6b7280;
+  opacity: 0.75;
+}
+.liked-card__status--unavailable {
+  background: #e5e7eb;
+  color: #4b5563;
+}
+
+.liked-card--unavailable .liked-card__image img {
+  opacity: 0.65;
+}

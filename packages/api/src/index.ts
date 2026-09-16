@@ -48,3 +48,5 @@ export * from "./lib/notifications/notification";
 export * from "./lib/notifications/useNotifications";
 export * from "./lib/notifications/useMarkNotificationRead";
 
+export * from "./lib/dashboard/dashboard";
+export * from "./lib/dashboard/useDashboard";

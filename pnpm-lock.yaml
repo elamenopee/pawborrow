@@ -170,7 +170,7 @@ importers:
   packages/api:
     dependencies:
       '@supabase/supabase-js':
-        specifier: ^2.x
+        specifier: ^2.116.0
         version: 2.116.0
       react:
         specifier: ^19.0.0

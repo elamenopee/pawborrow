@@ -7,7 +7,6 @@ import Login from "./pages/login";
 import Dashboard from "./pages/Dashboard";
 import Users from "./pages/Users";
 import Bookings from "./pages/Bookings";
-import Necessities from "./pages/Necessities";
 import Pets from "./pages/Pets";
 import Order from "./pages/Order";
 import Reviews from "./pages/Reviews";
@@ -35,10 +34,6 @@ function App() {
           <Route
             path="/bookings"
             element={<Bookings/>}
-          />
-          <Route
-            path="/necessities"
-            element={<Necessities />}
           />
           <Route path="/pets" element={<Pets />} />
           <Route path="/order" element={<Order />} />

@@ -1,110 +1,168 @@
-import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  type ReactNode,
+} from "react";
 
-export interface UserProfile {
-  email: string;
-  displayName: string;
-  fullName: string;
-  phoneNumber: string;
-  accountCreated: string;
-}
+import { supabase } from "@repo/api";
 
-export const getUserScopedStorageKey = (prefix: string, email?: string | null) => {
-  const normalizedEmail = (email ?? 'guest').trim().toLowerCase();
-  const safeEmail = normalizedEmail.replace(/[^a-z0-9@._-]/g, '_') || 'guest';
-  return `${prefix}-${safeEmail}`;
-};
+/* =====================================
+   TYPES
+===================================== */
 
-interface AuthContextValue {
+type AuthUser = Awaited<
+  ReturnType<typeof supabase.auth.getUser>
+>["data"]["user"];
+
+type AuthContextType = {
+  user: AuthUser | null;
   isLoggedIn: boolean;
-  user: UserProfile | null;
-  login: (profile?: Partial<UserProfile>) => void;
-  logout: () => void;
-}
-
-const SESSION_STORAGE_KEY = 'pawborrow-session';
-const USER_STORAGE_KEY = 'pawborrow-user';
-
-export const defaultUserProfile: UserProfile = {
-  email: 'test@pawborrow.com',
-  displayName: 'Sarah',
-  fullName: 'Sarah',
-  phoneNumber: '+62 812 3456 7890',
-  accountCreated: 'August 2024',
+  loading: boolean;
+  logout: () => Promise<void>;
 };
 
-const readStoredUser = (): UserProfile | null => {
-  if (typeof window === 'undefined') return null;
+type AuthProviderProps = {
+  children: ReactNode;
+};
 
-  const storedUser = window.localStorage.getItem(USER_STORAGE_KEY);
-  if (!storedUser) return null;
+/* =====================================
+   CONTEXT
+===================================== */
 
-  try {
-    const parsedUser = JSON.parse(storedUser) as Partial<UserProfile>;
-    return {
-      ...defaultUserProfile,
-      ...parsedUser,
-    };
-  } catch {
-    return null;
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+/* =====================================
+   USER-SCOPED STORAGE KEY
+===================================== */
+
+export const getUserScopedStorageKey = (
+  baseKey: string,
+  email?: string,
+): string => {
+  if (!email) {
+    return baseKey;
   }
+
+  return `${baseKey}-${email}`;
 };
 
-const AuthContext = createContext<AuthContextValue | undefined>(undefined);
+/* =====================================
+   AUTH PROVIDER
+===================================== */
 
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
+export const AuthProvider = ({ children }: AuthProviderProps) => {
+  const [user, setUser] = useState<AuthUser | null>(null);
+
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [user, setUser] = useState<UserProfile | null>(null);
+
+  const [loading, setLoading] = useState(true);
+
+  /* ===================================
+     CHECK INITIAL SESSION
+  =================================== */
 
   useEffect(() => {
-    if (typeof window === 'undefined') return;
+    let mounted = true;
 
-    const hasPersistedSession = window.localStorage.getItem(SESSION_STORAGE_KEY) === 'true';
-    if (!hasPersistedSession) {
-      window.localStorage.removeItem(USER_STORAGE_KEY);
-      window.localStorage.removeItem(SESSION_STORAGE_KEY);
-      setUser(null);
-      setIsLoggedIn(false);
-      return;
-    }
+    const checkSession = async () => {
+      try {
+        const {
+          data: { session },
+          error,
+        } = await supabase.auth.getSession();
 
-    window.localStorage.removeItem(USER_STORAGE_KEY);
-    window.localStorage.removeItem(SESSION_STORAGE_KEY);
-    setUser(null);
-    setIsLoggedIn(false);
-  }, []);
+        if (error) {
+          console.error("Error checking session:", error);
+        }
 
-  const login = (profile: Partial<UserProfile> = {}) => {
-    const nextUser = {
-      ...defaultUserProfile,
-      ...readStoredUser(),
-      ...profile,
+        if (!mounted) {
+          return;
+        }
+
+        console.log("Initial Supabase session:", session);
+
+        setUser(session?.user ?? null);
+        setIsLoggedIn(!!session);
+      } catch (error) {
+        console.error("Authentication error:", error);
+
+        if (!mounted) {
+          return;
+        }
+
+        setUser(null);
+        setIsLoggedIn(false);
+      } finally {
+        if (mounted) {
+          setLoading(false);
+        }
+      }
     };
 
-    if (typeof window !== 'undefined') {
-      window.localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(nextUser));
-      window.localStorage.setItem(SESSION_STORAGE_KEY, 'true');
+    checkSession();
+
+    /* =================================
+       LISTEN FOR AUTH CHANGES
+    ================================= */
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if (!mounted) {
+        return;
+      }
+
+      console.log("Auth event:", event);
+
+      console.log("Auth session:", session);
+
+      setUser(session?.user ?? null);
+      setIsLoggedIn(!!session);
+    });
+
+    /* =================================
+       CLEANUP
+    ================================= */
+
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
+  }, []);
+
+  /* ===================================
+     LOGOUT
+  =================================== */
+
+  const logout = async () => {
+    console.log("Logging out...");
+
+    const { error } = await supabase.auth.signOut();
+
+    if (error) {
+      console.error("Logout error:", error);
+
+      throw error;
     }
 
-    setUser(nextUser);
-    setIsLoggedIn(true);
-  };
-
-  const logout = () => {
-    if (typeof window !== 'undefined') {
-      window.localStorage.removeItem(USER_STORAGE_KEY);
-      window.localStorage.removeItem(SESSION_STORAGE_KEY);
-    }
+    console.log("Supabase session removed.");
 
     setUser(null);
     setIsLoggedIn(false);
   };
+
+  /* ===================================
+     PROVIDER
+  =================================== */
 
   return (
     <AuthContext.Provider
       value={{
-        isLoggedIn,
         user,
-        login,
+        isLoggedIn,
+        loading,
         logout,
       }}
     >
@@ -114,7 +172,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 };
 
 export const useAuth = () => {
-  const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error('useAuth must be used within an AuthProvider');
-  return ctx;
+  const context = useContext(AuthContext);
+
+  if (!context) {
+    throw new Error("useAuth must be used inside AuthProvider");
+  }
+
+  return context;
 };

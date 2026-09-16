@@ -12,6 +12,25 @@ export type Pet = {
   image: string | null;
   hourlyRate: number;
 };
+
+export type CreatePetInput = {
+  name: string;
+  breed?: string | null;
+  category_id: number;
+  personality?: string[];
+  image_url?: string | null;
+  status?: PetStatus; // defaults to "available" in the DB if omitted
+};
+
+export type UpdatePetInput = Partial<{
+  name: string;
+  breed: string | null;
+  category_id: number;
+  personality: string[];
+  image_url: string | null;
+}>;
+
+// Raw select shape shared by every query below.
 const PET_SELECT = `
   pet_id,
   name,
@@ -43,31 +62,68 @@ function mapPetRow(pet: any): Pet {
   };
 }
 
+// ---- READ ----
 
+// Customer-facing: only pets that can currently be booked.
 export async function getPets(): Promise<Pet[]> {
+  const { data, error } = await supabase
+    .from("pet")
+    .select(PET_SELECT)
+    .eq("status", "available")
+    .order("created_at", { ascending: false });
+
+  if (error) throw error;
+  return (data ?? []).map(mapPetRow);
+}
+
+// Admin-facing: every pet regardless of status.
+export async function getAllPetsAdmin(): Promise<Pet[]> {
   const { data, error } = await supabase
     .from("pet")
     .select(PET_SELECT)
     .order("created_at", { ascending: false });
 
-  if (error) {
-    throw error;
-  }
-
+  if (error) throw error;
   return (data ?? []).map(mapPetRow);
 }
 
-export async function getAllPetsAdmin(): Promise<Pet[]> {
+export async function getPetById(petId: number): Promise<Pet> {
   const { data, error } = await supabase
     .from("pet")
     .select(PET_SELECT)
-    .order("created_at", { ascending: true });
+    .eq("pet_id", petId)
+    .single();
 
-  if (error) {
-    throw error;
-  }
+  if (error) throw error;
+  return mapPetRow(data);
+}
 
-  return (data ?? []).map(mapPetRow);
+// ---- CREATE (admin only — enforced by RLS) ----
+export async function createPet(pet: CreatePetInput): Promise<Pet> {
+  const { data, error } = await supabase
+    .from("pet")
+    .insert(pet)
+    .select(PET_SELECT)
+    .single();
+
+  if (error) throw error;
+  return mapPetRow(data);
+}
+
+// ---- UPDATE (admin only — enforced by RLS) ----
+export async function updatePet(
+  petId: number,
+  updates: UpdatePetInput
+): Promise<Pet> {
+  const { data, error } = await supabase
+    .from("pet")
+    .update(updates)
+    .eq("pet_id", petId)
+    .select(PET_SELECT)
+    .single();
+
+  if (error) throw error;
+  return mapPetRow(data);
 }
 
 export async function updatePetStatus(
@@ -81,9 +137,12 @@ export async function updatePetStatus(
     .select(PET_SELECT)
     .single();
 
-  if (error) {
-    throw error;
-  }
-
+  if (error) throw error;
   return mapPetRow(data);
+}
+
+// ---- DELETE (admin only — enforced by RLS) ----
+export async function deletePet(petId: number): Promise<void> {
+  const { error } = await supabase.from("pet").delete().eq("pet_id", petId);
+  if (error) throw error;
 }

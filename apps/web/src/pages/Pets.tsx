@@ -1,10 +1,9 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
-  useSearchParams,
   useNavigate,
+  useSearchParams,
 } from "react-router-dom";
 
-import PetsCategoryRow from "@/components/layout/Pets/PetsCategoryRow";
 import PetsFilterSidebar from "@/components/layout/Pets/PetFilterSidebar";
 import PetsGrid from "@/components/layout/Pets/PetGrid";
 import ProductsGrid from "@/components/layout/Pets/ProductsGrid";
@@ -31,12 +30,25 @@ import "@/styles/Pet.css";
 
 const PAGE_SIZE = 9;
 
+type PetSortOption =
+  | "latest"
+  | "name";
+
 export default function PetsPage() {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] =
+    useSearchParams();
+
   const navigate = useNavigate();
-  const { user, loading: authLoading } = useAuth();
+
+  const {
+    user,
+    loading: authLoading,
+  } = useAuth();
+
   usePetRealTime();
-  const categoryFromUrl = searchParams.get("category");
+
+  const categoryFromUrl =
+    searchParams.get("category");
 
   const {
     data: pets = [],
@@ -49,11 +61,12 @@ export default function PetsPage() {
     isLoading: categoriesLoading,
     isError: categoriesError,
   } = useCategories();
- const {
-  data: likedPets = [],
-  isLoading: likedPetsLoading,
-  error: likedPetsError,
-} = useLikedPets(Boolean(user));
+
+  const {
+    data: likedPets = [],
+    isLoading: likedPetsLoading,
+    error: likedPetsError,
+  } = useLikedPets(Boolean(user));
 
   const {
     mutate: addLikedPet,
@@ -65,95 +78,193 @@ export default function PetsPage() {
     isPending: isRemovingLikedPet,
   } = useRemoveLikedPet();
 
-  const [selectedCategory, setSelectedCategory] = useState(
-    categoryFromUrl || "Cat",
+  const [
+    selectedCategory,
+    setSelectedCategory,
+  ] = useState(
+    categoryFromUrl || "All",
   );
 
-  const [selectedBreed, setSelectedBreed] = useState("");
+  const [
+    selectedBreed,
+    setSelectedBreed,
+  ] = useState("");
 
-  const [selectedPersonality, setSelectedPersonality] = useState("");
+  const [
+    selectedPersonality,
+    setSelectedPersonality,
+  ] = useState("");
 
   const [page, setPage] = useState(1);
 
-  const isLoading = authLoading || petsLoading || categoriesLoading || (Boolean(user) && likedPetsLoading);
+  const [sortOrder, setSortOrder] =
+    useState<PetSortOption>("latest");
 
-  const isError = petsError || categoriesError;
+  useEffect(() => {
+    setSelectedCategory(
+      categoryFromUrl || "All",
+    );
 
-  const isProductMode = PRODUCT_CATEGORIES.includes(selectedCategory);
+    setSelectedBreed("");
+    setSelectedPersonality("");
+    setPage(1);
+  }, [categoryFromUrl]);
+
+  const isLoading =
+    authLoading ||
+    petsLoading ||
+    categoriesLoading ||
+    (Boolean(user) && likedPetsLoading);
+
+  const isError =
+    petsError || categoriesError;
+
+  const isProductMode =
+    PRODUCT_CATEGORIES.includes(
+      selectedCategory,
+    );
 
   const likedPetIds = useMemo(() => {
-  return new Set(
-    likedPets.map((likedPet) => Number(likedPet.pet_id))
-  );
-}, [likedPets]);
+    return new Set(
+      likedPets.map((likedPet) =>
+        Number(likedPet.pet_id),
+      ),
+    );
+  }, [likedPets]);
 
-const isUpdatingLike =
-  isAddingLikedPet || isRemovingLikedPet;
+  const isUpdatingLike =
+    isAddingLikedPet ||
+    isRemovingLikedPet;
 
   const categoryItems = useMemo(() => {
-    return categories.map((category) => ({
-      label: category.label,
+    const databaseCategories =
+      categories
+        .filter(
+          (category) =>
+            typeof category.label ===
+            "string",
+        )
+        .map((category) => ({
+          label: category.label,
 
-      count: pets.filter((pet) => pet.category === category.label).length,
-    }));
+          count: pets.filter(
+            (pet) =>
+              pet.category
+                ?.trim()
+                .toLowerCase() ===
+              category.label
+                .trim()
+                .toLowerCase(),
+          ).length,
+        }));
+
+    return [
+      {
+        label: "All",
+        count: pets.length,
+      },
+      ...databaseCategories,
+    ];
   }, [categories, pets]);
-
-
 
   const breedItems = useMemo(() => {
     if (isProductMode) {
-      return ANIMAL_FILTERS.map((animal) => ({
-        label: animal,
+      return ANIMAL_FILTERS.map(
+        (animal) => ({
+          label: animal,
 
-        count: products.filter(
-          (product) =>
-            product.productCategory === selectedCategory &&
-            product.animals.includes(animal),
-        ).length,
-      }));
+          count: products.filter(
+            (product) =>
+              product.productCategory ===
+                selectedCategory &&
+              product.animals.includes(
+                animal,
+              ),
+          ).length,
+        }),
+      );
     }
 
-    const categoryPets = pets.filter(
-      (pet) => pet.category === selectedCategory,
-    );
+    const categoryPets =
+      selectedCategory === "All"
+        ? pets
+        : pets.filter(
+            (pet) =>
+              pet.category
+                ?.trim()
+                .toLowerCase() ===
+              selectedCategory
+                .trim()
+                .toLowerCase(),
+          );
 
-    const breedCounts = new Map<string, number>();
+    const breedCounts =
+      new Map<string, number>();
 
     categoryPets.forEach((pet) => {
-      if (!pet.breed) {
-        return;
-      }
+      if (!pet.breed) return;
 
-      breedCounts.set(pet.breed, (breedCounts.get(pet.breed) ?? 0) + 1);
+      breedCounts.set(
+        pet.breed,
+        (breedCounts.get(pet.breed) ??
+          0) + 1,
+      );
     });
 
-    return Array.from(breedCounts.entries()).map(([breed, count]) => ({
+    return Array.from(
+      breedCounts.entries(),
+    ).map(([breed, count]) => ({
       label: breed,
       count,
     }));
-  }, [pets, selectedCategory, isProductMode]);
+  }, [
+    pets,
+    selectedCategory,
+    isProductMode,
+  ]);
 
+  const breedFilterTitle =
+    isProductMode
+      ? "Filter by animal"
+      : "Filter by breed";
 
-  const breedFilterTitle = isProductMode
-    ? "Filter by animal"
-    : "Filter by breed";
+  const showPersonality =
+    !isProductMode;
 
-  const showPersonality = !isProductMode;
-
+  // First: filter the complete pet list.
   const filteredPets = useMemo(() => {
     if (isProductMode) {
       return [];
     }
 
     return pets.filter((pet) => {
-      const matchesCategory = pet.category === selectedCategory;
+      const matchesCategory =
+        selectedCategory === "All" ||
+        pet.category
+          ?.trim()
+          .toLowerCase() ===
+          selectedCategory
+            .trim()
+            .toLowerCase();
 
-      const matchesBreed = !selectedBreed || pet.breed === selectedBreed;
+      const matchesBreed =
+        !selectedBreed ||
+        pet.breed === selectedBreed;
 
       const matchesPersonality =
-        !selectedPersonality || pet.personality.includes(selectedPersonality);
+        !selectedPersonality ||
+        (Array.isArray(
+          pet.personality,
+        ) &&
+          pet.personality.includes(
+            selectedPersonality,
+          ));
 
-      return matchesCategory && matchesBreed && matchesPersonality;
+      return (
+        matchesCategory &&
+        matchesBreed &&
+        matchesPersonality
+      );
     });
   }, [
     pets,
@@ -163,90 +274,189 @@ const isUpdatingLike =
     isProductMode,
   ]);
 
+  // Second: sort the filtered list.
+  const sortedPets = useMemo(() => {
+    const sorted = [...filteredPets];
+
+    if (sortOrder === "name") {
+      return sorted.sort(
+        (firstPet, secondPet) =>
+          firstPet.name.localeCompare(
+            secondPet.name,
+            undefined,
+            {
+              sensitivity: "base",
+            },
+          ),
+      );
+    }
+
+    // Higher IDs are treated as newer.
+    return sorted.sort(
+      (firstPet, secondPet) =>
+        Number(secondPet.id) -
+        Number(firstPet.id),
+    );
+  }, [filteredPets, sortOrder]);
+
   const filteredProducts = useMemo(() => {
     if (!isProductMode) {
       return [];
     }
 
     return products.filter((product) => {
-      const matchesCategory = product.productCategory === selectedCategory;
+      const matchesCategory =
+        product.productCategory ===
+        selectedCategory;
 
       const matchesAnimal =
-        !selectedBreed || product.animals.includes(selectedBreed);
+        !selectedBreed ||
+        product.animals.includes(
+          selectedBreed,
+        );
 
-      return matchesCategory && matchesAnimal;
+      return (
+        matchesCategory &&
+        matchesAnimal
+      );
     });
-  }, [selectedCategory, selectedBreed, isProductMode]);
+  }, [
+    selectedCategory,
+    selectedBreed,
+    isProductMode,
+  ]);
 
   const activeCount = isProductMode
     ? filteredProducts.length
-    : filteredPets.length;
+    : sortedPets.length;
 
-  const totalPages = Math.max(1, Math.ceil(activeCount / PAGE_SIZE));
+  const totalPages = Math.max(
+    1,
+    Math.ceil(activeCount / PAGE_SIZE),
+  );
 
+  // Third: paginate the sorted list.
   const visiblePets = useMemo(() => {
-    const start = (page - 1) * PAGE_SIZE;
+    const start =
+      (page - 1) * PAGE_SIZE;
 
-    return filteredPets.slice(start, start + PAGE_SIZE);
-  }, [filteredPets, page]);
+    return sortedPets.slice(
+      start,
+      start + PAGE_SIZE,
+    );
+  }, [sortedPets, page]);
 
-  const visibleProducts = useMemo(() => {
-    const start = (page - 1) * PAGE_SIZE;
+  const visibleProducts =
+    useMemo(() => {
+      const start =
+        (page - 1) * PAGE_SIZE;
 
-    return filteredProducts.slice(start, start + PAGE_SIZE);
-  }, [filteredProducts, page]);
+      return filteredProducts.slice(
+        start,
+        start + PAGE_SIZE,
+      );
+    }, [filteredProducts, page]);
 
-  function handleSelectCategory(label: string) {
+  function handleSelectCategory(
+    label: string,
+  ) {
     setSelectedCategory(label);
-
     setSelectedBreed("");
-
     setSelectedPersonality("");
+    setPage(1);
+
+    if (label === "All") {
+      setSearchParams({});
+    } else {
+      setSearchParams({
+        category: label,
+      });
+    }
+  }
+
+  function handleSelectBreed(
+    label: string,
+  ) {
+    setSelectedBreed((previous) =>
+      previous === label ? "" : label,
+    );
 
     setPage(1);
   }
 
-  function handleSelectBreed(label: string) {
-    setSelectedBreed((previous) => (previous === label ? "" : label));
+  function handleSelectPersonality(
+    label: string,
+  ) {
+    setSelectedPersonality(
+      (previous) =>
+        previous === label
+          ? ""
+          : label,
+    );
 
     setPage(1);
   }
 
-  function handleSelectPersonality(label: string) {
-    setSelectedPersonality((previous) => (previous === label ? "" : label));
-
+  function handleSortChange(
+    value: PetSortOption,
+  ) {
+    setSortOrder(value);
     setPage(1);
   }
-  function handleToggleLike(petId: number) {
-  if (!user) {
-    navigate("/login", {
-      state: {
-        message: "Please sign in to like pets.",
-        returnTo: "/pets",
-      },
-    });
 
-    return;
-  }
+  function handleToggleLike(
+    petId: number,
+  ) {
+    if (!user) {
+      navigate("/login", {
+        state: {
+          message:
+            "Please sign in to like pets.",
+          returnTo: "/pets",
+        },
+      });
 
-  if (isUpdatingLike) return;
+      return;
+    }
 
-  if (likedPetIds.has(petId)) {
-    removeLikedPet(petId, {
+    if (isUpdatingLike) return;
+
+    if (likedPetIds.has(petId)) {
+      removeLikedPet(petId, {
+        onError: (error) => {
+          console.error(
+            "Failed to remove liked pet:",
+            error,
+          );
+        },
+      });
+
+      return;
+    }
+
+    addLikedPet(petId, {
       onError: (error) => {
-        console.error("Failed to remove liked pet:", error);
+        console.error(
+          "Failed to add liked pet:",
+          error,
+        );
       },
     });
-
-    return;
   }
 
-  addLikedPet(petId, {
-    onError: (error) => {
-      console.error("Failed to add liked pet:", error);
-    },
-  });
-}
+  if (isLoading) {
+    return (
+      <>
+        <Navbar />
+
+        <main className="flex min-h-[60vh] items-center justify-center">
+          <p className="text-sm text-gray-500">
+            Loading pets...
+          </p>
+        </main>
+      </>
+    );
+  }
 
   if (isError) {
     return (
@@ -254,7 +464,9 @@ const isUpdatingLike =
         <Navbar />
 
         <main className="flex min-h-[60vh] items-center justify-center">
-          <p className="text-sm text-red-500">Failed to load pets.</p>
+          <p className="text-sm text-red-500">
+            Failed to load pets.
+          </p>
         </main>
       </>
     );
@@ -267,74 +479,107 @@ const isUpdatingLike =
       <header className="pets-hero">
         <div className="pets-hero-content">
           <div className="pets-hero-text">
-            <span className="eyebrow">PawBorrow &middot; Quezon City</span>
+            <span className="eyebrow">
+              PawBorrow &middot; Quezon City
+            </span>
 
-            <h1 className="text-5xl leading-[1.12] font-extrabold mb-4">
-              Friends come with {""}
-              <span className="text-froly-500">four paws.</span>
+            <h1 className="mb-4 text-5xl font-extrabold leading-[1.12]">
+              Friends come with{" "}
+              <span className="text-froly-500">
+                four paws.
+              </span>
             </h1>
 
             <p>
-              Browse available companions ready to share their love. Use the
-              filters below to find the perfect match and all the gear you'll
-              need.
+              Browse available companions
+              ready to share their love. Use
+              the filters below to find the
+              perfect match and all the gear
+              you'll need.
             </p>
           </div>
 
           <div className="pets-hero-image">
             <div className="hero-blob" />
 
-            <img src="/images/hero-pets.png" alt="Cat and dog" />
+            <img
+              src="/images/hero-pets.png"
+              alt="Cat and dog"
+            />
           </div>
         </div>
       </header>
 
-      <PetsCategoryRow />
-
       <div className="pets-content">
         <PetsFilterSidebar
           categoryItems={categoryItems}
-          selectedCategory={selectedCategory}
+          selectedCategory={
+            selectedCategory
+          }
           selectedBreed={selectedBreed}
-          selectedPersonality={selectedPersonality}
+          selectedPersonality={
+            selectedPersonality
+          }
           breedItems={breedItems}
-          breedFilterTitle={breedFilterTitle}
-          showPersonality={showPersonality}
-          onSelectCategory={handleSelectCategory}
-          onSelectBreed={handleSelectBreed}
-          onSelectPersonality={handleSelectPersonality}
+          breedFilterTitle={
+            breedFilterTitle
+          }
+          showPersonality={
+            showPersonality
+          }
+          onSelectCategory={
+            handleSelectCategory
+          }
+          onSelectBreed={
+            handleSelectBreed
+          }
+          onSelectPersonality={
+            handleSelectPersonality
+          }
         />
 
-{user && likedPetsError && (
-  <p className="text-sm text-red-500">
-    {likedPetsError instanceof Error
-      ? likedPetsError.message
-      : "Failed to load liked pets."}
-  </p>
-)}
+        {user && likedPetsError && (
+          <p className="text-sm text-red-500">
+            {likedPetsError instanceof Error
+              ? likedPetsError.message
+              : "Failed to load liked pets."}
+          </p>
+        )}
 
-{isProductMode ? (
-  <ProductsGrid
-    products={visibleProducts}
-    page={page}
-    totalPages={totalPages}
-    onPageChange={setPage}
-    totalCount={filteredProducts.length}
-    pageSize={PAGE_SIZE}
-  />
-) : (
-  <PetsGrid
-    pets={visiblePets}
-    page={page}
-    totalPages={totalPages}
-    onPageChange={setPage}
-    totalCount={filteredPets.length}
-    pageSize={PAGE_SIZE}
-    likedPetIds={likedPetIds}
-    onToggleLike={handleToggleLike}
-    isUpdatingLike={isUpdatingLike}
-  />
-)}
+        {isProductMode ? (
+          <ProductsGrid
+            products={visibleProducts}
+            page={page}
+            totalPages={totalPages}
+            onPageChange={setPage}
+            totalCount={
+              filteredProducts.length
+            }
+            pageSize={PAGE_SIZE}
+          />
+        ) : (
+          <PetsGrid
+            pets={visiblePets}
+            page={page}
+            totalPages={totalPages}
+            onPageChange={setPage}
+            totalCount={
+              sortedPets.length
+            }
+            pageSize={PAGE_SIZE}
+            likedPetIds={likedPetIds}
+            onToggleLike={
+              handleToggleLike
+            }
+            isUpdatingLike={
+              isUpdatingLike
+            }
+            sortOrder={sortOrder}
+            onSortChange={
+              handleSortChange
+            }
+          />
+        )}
       </div>
 
       <Footer />

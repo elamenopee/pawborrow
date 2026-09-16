@@ -1,37 +1,18 @@
-import { Navigate, Route } from "react-router-dom";
-import type { JSX } from "react";
-
-import {
-  IonApp,
-  IonRouterOutlet,
-  IonTabBar,
-  IonTabButton,
-  IonTabs,
-  IonIcon,
-  IonLabel,
-  setupIonicReact,
-} from "@ionic/react";
-
+import { IonApp, IonRouterOutlet } from "@ionic/react";
 import { IonReactRouter } from "@ionic/react-router";
+import { Navigate, Route } from "react-router-dom";
 
-import {
-  homeOutline,
-  storefrontOutline,
-  schoolOutline,
-  timeOutline,
-  personOutline,
-} from "ionicons/icons";
+import { AuthProvider } from "./context/AuthContext";
+import ProtectedRoute from "./router/ProtectedRoute";
+import PublicRoute from "./router/PublicRoute";
 
-/* Pages */
+// Pages
 import Login from "./pages/Login";
 import SignUp from "./pages/SignUp";
-
 import Dashboard from "./pages/Dashboard";
 import Shop from "./pages/Shop";
-import Training from "./pages/Training";
 import History from "./pages/History";
 import Profile from "./pages/Profile";
-
 import Notifications from "./pages/Notification";
 import BreedSelection from "./pages/BreedSelection";
 import PetCategory from "./pages/PetCategory";
@@ -49,14 +30,7 @@ import TermsOfService from "./pages/TermsOfService";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import Cart from "./pages/Cart";
 
-/* Context */
-import { AuthProvider, useAuth } from "./context/AuthContext";
-
-import { BookingsProvider } from "./context/BookingsContext";
-
-import { CartProvider } from "./context/CartContext";
-
-/* Ionic CSS */
+// Ionic CSS
 import "@ionic/react/css/core.css";
 import "@ionic/react/css/normalize.css";
 import "@ionic/react/css/structure.css";
@@ -69,272 +43,247 @@ import "@ionic/react/css/text-transformation.css";
 import "@ionic/react/css/flex-utils.css";
 import "@ionic/react/css/display.css";
 
-/* Dark mode */
-import "@ionic/react/css/palettes/dark.system.css";
-
-/* Theme */
-import "./global.css";
+// App CSS
 import "./App.css";
-
-/* Splash screen images */
-import bernerSennenhundPuppiesPosing1 from "./assets/images/pets/berner-sennenhund-puppies-posing-1.png";
-import closeupShotOneGingerCatHuggingLickingOtherIsolatedWhiteWall1 from "./assets/images/pets/closeup-shot-one-ginger-cat-hugging-licking-other-isolated-white-wall-1.png";
-import image12 from "./assets/images/pets/image-12.png";
-import logo from "./assets/images/logo.png";
-import vector from "./assets/images/splash/vector.svg";
-
-setupIonicReact();
+import "./global.css";
 
 const App = () => {
   return (
-    <AuthProvider>
-      <BookingsProvider>
-        <CartProvider>
-          <AppContent />
-        </CartProvider>
-      </BookingsProvider>
-    </AuthProvider>
-  );
-};
-
-const AppContent = () => {
-  const { isLoggedIn, loading: authLoading } = useAuth();
-
-  /* =====================================
-     AUTH LOADING
-  ===================================== */
-
-  if (authLoading) {
-    return (
-      <IonApp>
-        <div className="flex min-h-screen items-center justify-center bg-white">
-          <span className="text-2xl text-[#442808]">Loading...</span>
-        </div>
-      </IonApp>
-    );
-  }
-
-  /* =====================================
-     NOT LOGGED IN
-  ===================================== */
-
-  if (!isLoggedIn) {
-    return (
-      <IonApp>
+    <IonApp>
+      <AuthProvider>
         <IonReactRouter>
           <IonRouterOutlet>
-            {/* Login */}
-            <Route path="/login" element={<Login />} />
 
-            {/* Sign Up */}
-            <Route path="/signup" element={<SignUp />} />
+            {/* =========================
+                PUBLIC ROUTES
+            ========================== */}
 
-            {/* Terms */}
-            <Route path="/terms-of-service" element={<TermsOfService />} />
+            <Route
+              path="/login"
+              element={
+                <PublicRoute>
+                  <Login />
+                </PublicRoute>
+              }
+            />
 
-            {/* Privacy */}
-            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+            <Route
+              path="/signup"
+              element={
+                <PublicRoute>
+                  <SignUp />
+                </PublicRoute>
+              }
+            />
 
-            {/* Anything else → Login */}
-            <Route path="*" element={<Navigate to="/login" replace />} />
-          </IonRouterOutlet>
-        </IonReactRouter>
-      </IonApp>
-    );
-  }
+            <Route
+              path="/terms-of-service"
+              element={<TermsOfService />}
+            />
 
-  /* =====================================
-     LOGGED IN
-  ===================================== */
+            <Route
+              path="/privacy-policy"
+              element={<PrivacyPolicy />}
+            />
 
-  return (
-    <IonApp>
-      <IonReactRouter>
-        <IonTabs>
-          {/* =================================
-              APP ROUTES
-          ================================= */}
+            {/* =========================
+                PROTECTED ROUTES
+            ========================== */}
 
-          <IonRouterOutlet>
-            {/* ================================
-                MAIN TABS
-            ================================= */}
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              }
+            />
 
-            {/* Home */}
-            <Route path="/dashboard" element={<Dashboard />} />
+            <Route
+              path="/shop"
+              element={
+                <ProtectedRoute>
+                  <Shop />
+                </ProtectedRoute>
+              }
+            />
 
-            {/* Shop */}
-            <Route path="/shop" element={<Shop />} />
+            <Route
+              path="/history"
+              element={
+                <ProtectedRoute>
+                  <History />
+                </ProtectedRoute>
+              }
+            />
 
-            {/* Training */}
-            <Route path="/training" element={<Training />} />
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoute>
+                  <Profile />
+                </ProtectedRoute>
+              }
+            />
 
-            {/* History */}
-            <Route path="/history" element={<History />} />
+            <Route
+              path="/notifications"
+              element={
+                <ProtectedRoute>
+                  <Notifications />
+                </ProtectedRoute>
+              }
+            />
 
-            {/* Profile */}
-            <Route path="/profile" element={<Profile />} />
+            <Route
+              path="/breed-selection"
+              element={
+                <ProtectedRoute>
+                  <BreedSelection />
+                </ProtectedRoute>
+              }
+            />
 
-            {/* ================================
-                OTHER APP PAGES
-            ================================= */}
+            <Route
+              path="/pet-category"
+              element={
+                <ProtectedRoute>
+                  <PetCategory />
+                </ProtectedRoute>
+              }
+            />
 
-            {/* Notifications */}
-            <Route path="/notifications" element={<Notifications />} />
+            <Route
+              path="/breed-pets"
+              element={
+                <ProtectedRoute>
+                  <BreedPets />
+                </ProtectedRoute>
+              }
+            />
 
-            {/* Breed Selection */}
-            <Route path="/breed-selection" element={<BreedSelection />} />
+            <Route
+              path="/pet-details/:id"
+              element={
+                <ProtectedRoute>
+                  <PetDetails />
+                </ProtectedRoute>
+              }
+            />
 
-            {/* Pet Category */}
-            <Route path="/pet-category" element={<PetCategory />} />
+            <Route
+              path="/about-us"
+              element={
+                <ProtectedRoute>
+                  <AboutUs />
+                </ProtectedRoute>
+              }
+            />
 
-            {/* Breed Pets */}
-            <Route path="/breed-pets" element={<BreedPets />} />
+            <Route
+              path="/liked-pets"
+              element={
+                <ProtectedRoute>
+                  <LikedPets />
+                </ProtectedRoute>
+              }
+            />
 
-            {/* Pet Details */}
-            <Route path="/pet-details" element={<PetDetails />} />
+            <Route
+              path="/my-bookings"
+              element={
+                <ProtectedRoute>
+                  <MyBookings />
+                </ProtectedRoute>
+              }
+            />
 
-            {/* Liked Pets */}
-            <Route path="/liked-pets" element={<LikedPets />} />
+            <Route
+              path="/payment-methods"
+              element={
+                <ProtectedRoute>
+                  <PaymentMethods />
+                </ProtectedRoute>
+              }
+            />
 
-            {/* My Bookings */}
-            <Route path="/my-bookings" element={<MyBookings />} />
-
-            {/* Payment Methods */}
-            <Route path="/payment-methods" element={<PaymentMethods />} />
-
-            {/* Notification Settings */}
             <Route
               path="/notification-settings"
-              element={<NotificationSettings />}
+              element={
+                <ProtectedRoute>
+                  <NotificationSettings />
+                </ProtectedRoute>
+              }
             />
 
-            {/* App Settings */}
-            <Route path="/app-settings" element={<AppSettings />} />
+            <Route
+              path="/app-settings"
+              element={
+                <ProtectedRoute>
+                  <AppSettings />
+                </ProtectedRoute>
+              }
+            />
 
-            {/* Booking Confirmation */}
             <Route
               path="/booking-confirmation"
-              element={<BookingConfirmation />}
+              element={
+                <ProtectedRoute>
+                  <BookingConfirmation />
+                </ProtectedRoute>
+              }
             />
 
-            {/* Booking Review */}
-            <Route path="/booking-review" element={<BookingReview />} />
+            <Route
+              path="/booking-review"
+              element={
+                <ProtectedRoute>
+                  <BookingReview />
+                </ProtectedRoute>
+              }
+            />
 
-            {/* Cart */}
-            <Route path="/cart" element={<Cart />} />
+            <Route
+              path="/cart"
+              element={
+                <ProtectedRoute>
+                  <Cart />
+                </ProtectedRoute>
+              }
+            />
 
-            {/* About Us */}
-            <Route path="/about-us" element={<AboutUs />} />
-
-            {/* Terms of Service */}
-            <Route path="/terms-of-service" element={<TermsOfService />} />
-
-            {/* Privacy Policy */}
-            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-
-            {/* ================================
+            {/* =========================
                 DEFAULT ROUTE
-            ================================= */}
+            ========================== */}
 
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+            <Route
+              path="/"
+              element={
+                <Navigate
+                  to="/dashboard"
+                  replace
+                />
+              }
+            />
 
-            {/* Unknown route → Dashboard */}
-            <Route path="*" element={<Navigate to="/dashboard" replace />} />
+            {/* =========================
+                UNKNOWN ROUTES
+            ========================== */}
+
+            <Route
+              path="*"
+              element={
+                <Navigate
+                  to="/dashboard"
+                  replace
+                />
+              }
+            />
+
           </IonRouterOutlet>
-
-          {/* =================================
-              BOTTOM TAB BAR
-          ================================= */}
-
-          <IonTabBar slot="bottom">
-            {/* Home */}
-            <IonTabButton tab="dashboard" href="/dashboard">
-              <IonIcon icon={homeOutline} />
-              <IonLabel>Home</IonLabel>
-            </IonTabButton>
-
-            {/* Shop */}
-            <IonTabButton tab="shop" href="/shop">
-              <IonIcon icon={storefrontOutline} />
-              <IonLabel>Shop</IonLabel>
-            </IonTabButton>
-
-            {/* Training */}
-            <IonTabButton tab="training" href="/training">
-              <IonIcon icon={schoolOutline} />
-              <IonLabel>Training</IonLabel>
-            </IonTabButton>
-
-            {/* History */}
-            <IonTabButton tab="history" href="/history">
-              <IonIcon icon={timeOutline} />
-              <IonLabel>History</IonLabel>
-            </IonTabButton>
-
-            {/* Profile */}
-            <IonTabButton tab="profile" href="/profile">
-              <IonIcon icon={personOutline} />
-              <IonLabel>Profile</IonLabel>
-            </IonTabButton>
-          </IonTabBar>
-        </IonTabs>
-      </IonReactRouter>
+        </IonReactRouter>
+      </AuthProvider>
     </IonApp>
-  );
-};
-
-/* =====================================
-   SPLASH SCREEN
-===================================== */
-
-export const SplashScreen = (): JSX.Element => {
-  return (
-    <div className="splash-screen-frame">
-      <div className="splash-screen">
-        {/* Logo */}
-        <div className="splash-logo-wrap">
-          <img className="img-photoroom" src={logo} alt="PawBorrow logo" />
-        </div>
-
-        {/* Arch */}
-        <div className="splash-arch" aria-hidden="true" />
-
-        {/* Pets */}
-        <div className="splash-pet-row">
-          <div className="pet-card">
-            <img
-              className="pet-photo"
-              src={bernerSennenhundPuppiesPosing1}
-              alt="Cute dog"
-            />
-          </div>
-
-          <div className="pet-card pet-card--middle">
-            <img className="pet-photo" src={image12} alt="Dog sitting" />
-          </div>
-
-          <div className="pet-card">
-            <img
-              className="pet-photo"
-              src={closeupShotOneGingerCatHuggingLickingOtherIsolatedWhiteWall1}
-              alt="Cat and dog"
-            />
-          </div>
-        </div>
-
-        {/* Vector */}
-        <img className="splash-vector" src={vector} alt="" aria-hidden="true" />
-
-        {/* Pet stand */}
-        <div className="pet-stand" aria-hidden="true">
-          <div className="pet-stand-inner" aria-hidden="true" />
-        </div>
-
-        {/* Bottom bar */}
-        <div className="splash-bottom-bar" />
-      </div>
-    </div>
   );
 };
 

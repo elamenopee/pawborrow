@@ -1,11 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 
-import {
-  IonContent,
-  IonIcon,
-  IonPage,
-} from "@ionic/react";
+import { IonContent, IonIcon, IonPage } from "@ionic/react";
 
 import {
   eyeOutline,
@@ -17,70 +13,44 @@ import {
 
 import logo from "../assets/images/logo.png";
 
-import {
-  signUp,
-  signInWithGoogle,
-} from "@repo/api";
+import { signUp, signInWithGoogle } from "@repo/api";
 
 const SignUp = () => {
   const navigate = useNavigate();
 
+  const [firstName, setFirstName] = useState("");
 
-  const [firstName, setFirstName] =
-    useState("");
+  const [lastName, setLastName] = useState("");
 
-  const [lastName, setLastName] =
-    useState("");
+  const [email, setEmail] = useState("");
 
-  const [email, setEmail] =
-    useState("");
+  const [password, setPassword] = useState("");
 
-  const [password, setPassword] =
-    useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
-  const [confirmPassword, setConfirmPassword] =
-    useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const [showPassword, setShowPassword] =
-    useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const [
-    showConfirmPassword,
-    setShowConfirmPassword,
-  ] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
 
-  const [loading, setLoading] =
-    useState(false);
+  const [error, setError] = useState("");
 
-  const [googleLoading, setGoogleLoading] =
-    useState(false);
+  const [success, setSuccess] = useState("");
 
-
-  const [error, setError] =
-    useState("");
-
-  const [success, setSuccess] =
-    useState("");
-
-
-  const handleRegister = async (
-    event: FormEvent<HTMLFormElement>
-  ) => {
+  const handleRegister = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     setError("");
     setSuccess("");
 
-    const trimmedFirstName =
-      firstName.trim();
+    const trimmedFirstName = firstName.trim();
 
-    const trimmedLastName =
-      lastName.trim();
+    const trimmedLastName = lastName.trim();
 
-    const trimmedEmail =
-      email.trim();
-
+    const trimmedEmail = email.trim();
 
     if (
       !trimmedFirstName ||
@@ -89,54 +59,32 @@ const SignUp = () => {
       !password ||
       !confirmPassword
     ) {
-      setError(
-        "Please fill in all fields."
-      );
+      setError("Please fill in all fields.");
       return;
     }
-
 
     if (password.length < 6) {
-      setError(
-        "Password must be at least 6 characters."
-      );
+      setError("Password must be at least 6 characters.");
       return;
     }
 
-    if (
-      password !== confirmPassword
-    ) {
-      setError(
-        "Passwords do not match."
-      );
+    if (password !== confirmPassword) {
+      setError("Passwords do not match.");
       return;
     }
 
     try {
       setLoading(true);
 
-      await signUp(
-        trimmedEmail,
-        password,
-        trimmedFirstName,
-        trimmedLastName
-      );
+      await signUp(trimmedEmail, password, trimmedFirstName, trimmedLastName);
 
-      setSuccess(
-        "Account created successfully!"
-      );
-
+      setSuccess("Account created successfully!");
 
       setTimeout(() => {
         navigate("/login");
       }, 1500);
-
     } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : "Registration failed."
-      );
+      setError(err instanceof Error ? err.message : "Registration failed.");
     } finally {
       setLoading(false);
     }
@@ -150,13 +98,8 @@ const SignUp = () => {
       setGoogleLoading(true);
 
       await signInWithGoogle();
-
     } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : "Google sign up failed."
-      );
+      setError(err instanceof Error ? err.message : "Google sign up failed.");
 
       setGoogleLoading(false);
     }
@@ -164,16 +107,10 @@ const SignUp = () => {
 
   return (
     <IonPage>
-      <IonContent
-        fullscreen
-        className="bg-white"
-      >
+      <IonContent fullscreen className="bg-white">
         <div className="min-h-screen w-full bg-white">
-
           <div className="mx-auto w-full max-w-md px-5">
-
             <div className="flex flex-col items-center pt-14">
-
               <h1 className="text-[36px] font-bold leading-none text-[#f58220]">
                 Sign Up
               </h1>
@@ -185,20 +122,11 @@ const SignUp = () => {
                   className="h-auto w-[240px] object-contain"
                 />
               </div>
-
             </div>
 
-
-            <form
-              onSubmit={handleRegister}
-              className="mt-12 pb-8"
-            >
-
+            <form onSubmit={handleRegister} className="mt-12 pb-8">
               <div className="grid grid-cols-2 gap-3">
-
-
                 <div>
-
                   <label
                     htmlFor="firstName"
                     className="mb-1 block text-sm text-[#444]"
@@ -207,7 +135,6 @@ const SignUp = () => {
                   </label>
 
                   <div className="relative">
-
                     <IonIcon
                       icon={personOutline}
                       className="
@@ -227,11 +154,7 @@ const SignUp = () => {
                       name="firstName"
                       type="text"
                       value={firstName}
-                      onChange={(event) =>
-                        setFirstName(
-                          event.target.value
-                        )
-                      }
+                      onChange={(event) => setFirstName(event.target.value)}
                       autoComplete="given-name"
                       className="
                         h-12
@@ -250,13 +173,10 @@ const SignUp = () => {
                         focus:ring-[#f58220]
                       "
                     />
-
                   </div>
-
                 </div>
 
                 <div>
-
                   <label
                     htmlFor="lastName"
                     className="mb-1 block text-sm text-[#444]"
@@ -265,7 +185,6 @@ const SignUp = () => {
                   </label>
 
                   <div className="relative">
-
                     <IonIcon
                       icon={personOutline}
                       className="
@@ -285,11 +204,7 @@ const SignUp = () => {
                       name="lastName"
                       type="text"
                       value={lastName}
-                      onChange={(event) =>
-                        setLastName(
-                          event.target.value
-                        )
-                      }
+                      onChange={(event) => setLastName(event.target.value)}
                       autoComplete="family-name"
                       className="
                         h-12
@@ -308,15 +223,11 @@ const SignUp = () => {
                         focus:ring-[#f58220]
                       "
                     />
-
                   </div>
-
                 </div>
-
               </div>
 
               <div className="mt-3">
-
                 <label
                   htmlFor="email"
                   className="mb-1 block text-sm text-[#444]"
@@ -325,7 +236,6 @@ const SignUp = () => {
                 </label>
 
                 <div className="relative">
-
                   <IonIcon
                     icon={mailOutline}
                     className="
@@ -345,11 +255,7 @@ const SignUp = () => {
                     name="email"
                     type="email"
                     value={email}
-                    onChange={(event) =>
-                      setEmail(
-                        event.target.value
-                      )
-                    }
+                    onChange={(event) => setEmail(event.target.value)}
                     placeholder="PawPaw@gmail.com"
                     autoComplete="email"
                     className="
@@ -370,14 +276,10 @@ const SignUp = () => {
                       focus:ring-[#f58220]
                     "
                   />
-
                 </div>
-
               </div>
 
-
               <div className="mt-3">
-
                 <label
                   htmlFor="password"
                   className="mb-1 block text-sm text-[#444]"
@@ -386,8 +288,6 @@ const SignUp = () => {
                 </label>
 
                 <div className="relative">
-
-
                   <IonIcon
                     icon={lockClosedOutline}
                     className="
@@ -405,17 +305,9 @@ const SignUp = () => {
                   <input
                     id="password"
                     name="password"
-                    type={
-                      showPassword
-                        ? "text"
-                        : "password"
-                    }
+                    type={showPassword ? "text" : "password"}
                     value={password}
-                    onChange={(event) =>
-                      setPassword(
-                        event.target.value
-                      )
-                    }
+                    onChange={(event) => setPassword(event.target.value)}
                     autoComplete="new-password"
                     className="
                       h-12
@@ -434,14 +326,9 @@ const SignUp = () => {
                     "
                   />
 
-
                   <button
                     type="button"
-                    onClick={() =>
-                      setShowPassword(
-                        !showPassword
-                      )
-                    }
+                    onClick={() => setShowPassword(!showPassword)}
                     className="
                       absolute
                       right-4
@@ -450,28 +337,18 @@ const SignUp = () => {
                       text-[#f58220]
                     "
                     aria-label={
-                      showPassword
-                        ? "Hide password"
-                        : "Show password"
+                      showPassword ? "Hide password" : "Show password"
                     }
                   >
                     <IonIcon
-                      icon={
-                        showPassword
-                          ? eyeOffOutline
-                          : eyeOutline
-                      }
+                      icon={showPassword ? eyeOffOutline : eyeOutline}
                       className="text-xl"
                     />
                   </button>
-
                 </div>
-
               </div>
 
- 
               <div className="mt-3">
-
                 <label
                   htmlFor="confirmPassword"
                   className="mb-1 block text-sm text-[#444]"
@@ -480,7 +357,6 @@ const SignUp = () => {
                 </label>
 
                 <div className="relative">
-
                   <IonIcon
                     icon={lockClosedOutline}
                     className="
@@ -498,17 +374,9 @@ const SignUp = () => {
                   <input
                     id="confirmPassword"
                     name="confirmPassword"
-                    type={
-                      showConfirmPassword
-                        ? "text"
-                        : "password"
-                    }
+                    type={showConfirmPassword ? "text" : "password"}
                     value={confirmPassword}
-                    onChange={(event) =>
-                      setConfirmPassword(
-                        event.target.value
-                      )
-                    }
+                    onChange={(event) => setConfirmPassword(event.target.value)}
                     autoComplete="new-password"
                     className="
                       h-12
@@ -529,11 +397,7 @@ const SignUp = () => {
 
                   <button
                     type="button"
-                    onClick={() =>
-                      setShowConfirmPassword(
-                        !showConfirmPassword
-                      )
-                    }
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                     className="
                       absolute
                       right-4
@@ -542,31 +406,20 @@ const SignUp = () => {
                       text-[#f58220]
                     "
                     aria-label={
-                      showConfirmPassword
-                        ? "Hide password"
-                        : "Show password"
+                      showConfirmPassword ? "Hide password" : "Show password"
                     }
                   >
                     <IonIcon
-                      icon={
-                        showConfirmPassword
-                          ? eyeOffOutline
-                          : eyeOutline
-                      }
+                      icon={showConfirmPassword ? eyeOffOutline : eyeOutline}
                       className="text-xl"
                     />
                   </button>
-
                 </div>
-
               </div>
 
               {error && (
-                <p className="mt-4 text-center text-sm text-red-500">
-                  {error}
-                </p>
+                <p className="mt-4 text-center text-sm text-red-500">{error}</p>
               )}
-
 
               {success && (
                 <p className="mt-4 text-center text-sm text-green-600">
@@ -576,10 +429,7 @@ const SignUp = () => {
 
               <button
                 type="submit"
-                disabled={
-                  loading ||
-                  googleLoading
-                }
+                disabled={loading || googleLoading}
                 className="
                   mt-7
                   h-11
@@ -596,27 +446,17 @@ const SignUp = () => {
                   disabled:opacity-60
                 "
               >
-                {loading
-                  ? "CREATING ACCOUNT..."
-                  : "CREATE ACCOUNT"}
+                {loading ? "CREATING ACCOUNT..." : "CREATE ACCOUNT"}
               </button>
 
               <div className="my-7 flex items-center">
-
                 <div className="h-px flex-1 bg-[#f58220]" />
-
               </div>
-
 
               <button
                 type="button"
-                onClick={
-                  handleGoogleSignup
-                }
-                disabled={
-                  loading ||
-                  googleLoading
-                }
+                onClick={handleGoogleSignup}
+                disabled={loading || googleLoading}
                 className="
                   flex
                   h-11
@@ -640,69 +480,53 @@ const SignUp = () => {
                   "CONNECTING..."
                 ) : (
                   <>
-                    <span className="text-base font-bold">
-                      G
-                    </span>
-
+                    <span className="text-base font-bold">G</span>
                     SIGN UP WITH GOOGLE
                   </>
                 )}
               </button>
 
-   
-              <p className="
+              <p
+                className="
                 mt-5
                 text-center
                 text-xs
                 leading-5
                 text-[#999]
-              ">
-                By creating an account, you agree
-                to our{" "}
-
+              "
+              >
+                By creating an account, you agree to our{" "}
                 <button
                   type="button"
-                  onClick={() =>
-                    navigate(
-                      "/terms-of-service"
-                    )
-                  }
+                  onClick={() => navigate("/terms-of-service")}
                   className="underline"
                 >
                   Terms of Service
                 </button>{" "}
-
                 and{" "}
-
                 <button
                   type="button"
-                  onClick={() =>
-                    navigate(
-                      "/privacy-policy"
-                    )
-                  }
+                  onClick={() => navigate("/privacy-policy")}
                   className="underline"
                 >
                   Privacy Policy
                 </button>
                 .
               </p>
-
             </form>
 
-            <div className="
+            <div
+              className="
               pb-7
               text-center
               text-sm
               text-[#999]
-            ">
+            "
+            >
               Already have an account?{" "}
-
               <button
                 type="button"
-                onClick={() =>
-                  navigate("/login")
-                }
+                onClick={() => navigate("/login")}
                 className="
                   underline
                   transition
@@ -712,9 +536,7 @@ const SignUp = () => {
                 Login
               </button>
             </div>
-
           </div>
-
         </div>
       </IonContent>
     </IonPage>

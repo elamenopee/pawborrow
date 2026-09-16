@@ -12,10 +12,9 @@ import { supabase } from "@repo/api";
    TYPES
 ===================================== */
 
-type AuthUser =
-  Awaited<
-    ReturnType<typeof supabase.auth.getUser>
-  >["data"]["user"];
+type AuthUser = Awaited<
+  ReturnType<typeof supabase.auth.getUser>
+>["data"]["user"];
 
 type AuthContextType = {
   user: AuthUser | null;
@@ -32,10 +31,7 @@ type AuthProviderProps = {
    CONTEXT
 ===================================== */
 
-const AuthContext =
-  createContext<AuthContextType | undefined>(
-    undefined
-  );
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 /* =====================================
    USER-SCOPED STORAGE KEY
@@ -43,7 +39,7 @@ const AuthContext =
 
 export const getUserScopedStorageKey = (
   baseKey: string,
-  email?: string
+  email?: string,
 ): string => {
   if (!email) {
     return baseKey;
@@ -56,17 +52,12 @@ export const getUserScopedStorageKey = (
    AUTH PROVIDER
 ===================================== */
 
-export const AuthProvider = ({
-  children,
-}: AuthProviderProps) => {
-  const [user, setUser] =
-    useState<AuthUser | null>(null);
+export const AuthProvider = ({ children }: AuthProviderProps) => {
+  const [user, setUser] = useState<AuthUser | null>(null);
 
-  const [isLoggedIn, setIsLoggedIn] =
-    useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  const [loading, setLoading] =
-    useState(true);
+  const [loading, setLoading] = useState(true);
 
   /* ===================================
      CHECK INITIAL SESSION
@@ -83,28 +74,19 @@ export const AuthProvider = ({
         } = await supabase.auth.getSession();
 
         if (error) {
-          console.error(
-            "Error checking session:",
-            error
-          );
+          console.error("Error checking session:", error);
         }
 
         if (!mounted) {
           return;
         }
 
-        console.log(
-          "Initial Supabase session:",
-          session
-        );
+        console.log("Initial Supabase session:", session);
 
         setUser(session?.user ?? null);
         setIsLoggedIn(!!session);
       } catch (error) {
-        console.error(
-          "Authentication error:",
-          error
-        );
+        console.error("Authentication error:", error);
 
         if (!mounted) {
           return;
@@ -127,26 +109,18 @@ export const AuthProvider = ({
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        if (!mounted) {
-          return;
-        }
-
-        console.log(
-          "Auth event:",
-          event
-        );
-
-        console.log(
-          "Auth session:",
-          session
-        );
-
-        setUser(session?.user ?? null);
-        setIsLoggedIn(!!session);
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if (!mounted) {
+        return;
       }
-    );
+
+      console.log("Auth event:", event);
+
+      console.log("Auth session:", session);
+
+      setUser(session?.user ?? null);
+      setIsLoggedIn(!!session);
+    });
 
     /* =================================
        CLEANUP
@@ -165,21 +139,15 @@ export const AuthProvider = ({
   const logout = async () => {
     console.log("Logging out...");
 
-    const { error } =
-      await supabase.auth.signOut();
+    const { error } = await supabase.auth.signOut();
 
     if (error) {
-      console.error(
-        "Logout error:",
-        error
-      );
+      console.error("Logout error:", error);
 
       throw error;
     }
 
-    console.log(
-      "Supabase session removed."
-    );
+    console.log("Supabase session removed.");
 
     setUser(null);
     setIsLoggedIn(false);
@@ -203,18 +171,11 @@ export const AuthProvider = ({
   );
 };
 
-/* =====================================
-   useAuth HOOK
-===================================== */
-
 export const useAuth = () => {
-  const context =
-    useContext(AuthContext);
+  const context = useContext(AuthContext);
 
   if (!context) {
-    throw new Error(
-      "useAuth must be used inside AuthProvider"
-    );
+    throw new Error("useAuth must be used inside AuthProvider");
   }
 
   return context;

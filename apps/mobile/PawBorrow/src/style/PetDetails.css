@@ -202,3 +202,63 @@
   padding: 40px;
   text-align: center;
 }
+.pet-details-date-input,
+.pet-details-time-input {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #dedede;
+  border-radius: 12px;
+  background: white;
+  padding: 12px 14px;
+  font-size: 14px;
+  outline: none;
+}
+
+.pet-details-time-input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pet-details-time-input-wrap ion-icon {
+  flex-shrink: 0;
+  font-size: 20px;
+}
+
+.pet-details-duration {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  overflow: hidden;
+  border: 1px solid #dedede;
+  border-radius: 12px;
+  background: white;
+}
+
+.pet-details-duration button {
+  width: 52px;
+  height: 46px;
+  border: none;
+  background: transparent;
+  font-size: 22px;
+}
+
+.pet-details-duration button:disabled {
+  color: #c5c5c5;
+}
+
+.pet-details-duration span {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.pet-details-error {
+  margin-top: 14px;
+  color: #dc2626;
+  font-size: 13px;
+}
+
+.pet-details-book-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}

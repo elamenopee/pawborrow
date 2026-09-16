@@ -5,164 +5,282 @@ import {
   useState,
   type ReactNode,
 } from "react";
-
 import { supabase } from "@repo/api";
+import type {
+  Session,
+  User,
+} from "@supabase/supabase-js";
 
-/* =====================================
-   TYPES
-===================================== */
+export interface UserProfile {
+  id: string;
+  email: string;
+  displayName: string;
+  fullName: string;
+  firstName: string;
+  lastName: string;
+  phoneNumber: string;
+  accountCreated: string;
+  avatarUrl?: string;
+}
 
-type AuthUser = Awaited<
-  ReturnType<typeof supabase.auth.getUser>
->["data"]["user"];
-
-type AuthContextType = {
-  user: AuthUser | null;
+interface AuthContextValue {
   isLoggedIn: boolean;
   loading: boolean;
+  user: UserProfile | null;
+  session: Session | null;
+  login: (
+    email: string,
+    password: string,
+  ) => Promise<void>;
   logout: () => Promise<void>;
-};
+}
 
-type AuthProviderProps = {
-  children: ReactNode;
-};
+const AuthContext =
+  createContext<AuthContextValue | undefined>(
+    undefined,
+  );
 
-/* =====================================
-   CONTEXT
-===================================== */
+async function loadUserProfile(
+  authUser: User,
+): Promise<UserProfile> {
+  const { data, error } = await supabase
+    .from("user_profiles")
+    .select(`
+      id,
+      first_name,
+      last_name,
+      email,
+      phone,
+      avatar_url,
+      created_at
+    `)
+    .eq("id", authUser.id)
+    .maybeSingle();
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-/* =====================================
-   USER-SCOPED STORAGE KEY
-===================================== */
-
-export const getUserScopedStorageKey = (
-  baseKey: string,
-  email?: string,
-): string => {
-  if (!email) {
-    return baseKey;
+  if (error) {
+    console.error(
+      "Failed to load user profile:",
+      error,
+    );
   }
 
-  return `${baseKey}-${email}`;
-};
+  const firstName =
+    data?.first_name ?? "";
 
-/* =====================================
-   AUTH PROVIDER
-===================================== */
+  const lastName =
+    data?.last_name ?? "";
 
-export const AuthProvider = ({ children }: AuthProviderProps) => {
-  const [user, setUser] = useState<AuthUser | null>(null);
+  const fullName =
+    [firstName, lastName]
+      .filter(Boolean)
+      .join(" ") ||
+    authUser.email ||
+    "Account";
 
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const createdAt =
+    data?.created_at ??
+    authUser.created_at;
 
-  const [loading, setLoading] = useState(true);
+  return {
+    id: authUser.id,
 
-  /* ===================================
-     CHECK INITIAL SESSION
-  =================================== */
+    email:
+      data?.email ??
+      authUser.email ??
+      "",
+
+    displayName:
+      firstName || fullName,
+
+    fullName,
+
+    firstName,
+
+    lastName,
+
+    phoneNumber:
+      data?.phone ?? "",
+
+    avatarUrl:
+      data?.avatar_url ?? undefined,
+
+    accountCreated: createdAt
+      ? new Date(
+          createdAt,
+        ).toLocaleDateString("en-US", {
+          month: "long",
+          year: "numeric",
+        })
+      : "",
+  };
+}
+
+export const AuthProvider = ({
+  children,
+}: {
+  children: ReactNode;
+}) => {
+  const [session, setSession] =
+    useState<Session | null>(null);
+
+  const [user, setUser] =
+    useState<UserProfile | null>(null);
+
+  const [loading, setLoading] =
+    useState(true);
 
   useEffect(() => {
-    let mounted = true;
+    let active = true;
 
-    const checkSession = async () => {
-      try {
-        const {
-          data: { session },
-          error,
-        } = await supabase.auth.getSession();
-
-        if (error) {
-          console.error("Error checking session:", error);
-        }
-
-        if (!mounted) {
-          return;
-        }
-
-        console.log("Initial Supabase session:", session);
-
-        setUser(session?.user ?? null);
-        setIsLoggedIn(!!session);
-      } catch (error) {
-        console.error("Authentication error:", error);
-
-        if (!mounted) {
-          return;
-        }
-
-        setUser(null);
-        setIsLoggedIn(false);
-      } finally {
-        if (mounted) {
-          setLoading(false);
-        }
-      }
-    };
-
-    checkSession();
-
-    /* =================================
-       LISTEN FOR AUTH CHANGES
-    ================================= */
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
-      if (!mounted) {
+    async function applySession(
+      nextSession: Session | null,
+    ) {
+      if (!active) {
         return;
       }
 
-      console.log("Auth event:", event);
+      setSession(nextSession);
 
-      console.log("Auth session:", session);
+      if (!nextSession?.user) {
+        setUser(null);
+        setLoading(false);
+        return;
+      }
 
-      setUser(session?.user ?? null);
-      setIsLoggedIn(!!session);
-    });
+      try {
+        const profile =
+          await loadUserProfile(
+            nextSession.user,
+          );
 
-    /* =================================
-       CLEANUP
-    ================================= */
+        if (active) {
+          setUser(profile);
+        }
+      } catch (error) {
+        console.error(
+          "Failed to apply user profile:",
+          error,
+        );
+
+        if (active) {
+          setUser(null);
+        }
+      } finally {
+        if (active) {
+          setLoading(false);
+        }
+      }
+    }
+
+    async function initializeAuth() {
+      setLoading(true);
+
+      try {
+        const {
+          data,
+          error,
+        } =
+          await supabase.auth.getSession();
+
+        if (error) {
+          throw error;
+        }
+
+        await applySession(data.session);
+      } catch (error) {
+        console.error(
+          "Failed to restore Supabase session:",
+          error,
+        );
+
+        if (active) {
+          setSession(null);
+          setUser(null);
+          setLoading(false);
+        }
+      }
+    }
+
+    initializeAuth();
+
+    const {
+      data: { subscription },
+    } =
+      supabase.auth.onAuthStateChange(
+        (_event, nextSession) => {
+          if (!active) {
+            return;
+          }
+
+          setLoading(true);
+
+          /*
+           * Run profile loading after the auth callback
+           * finishes to avoid blocking Supabase auth.
+           */
+          window.setTimeout(() => {
+            applySession(nextSession);
+          }, 0);
+        },
+      );
 
     return () => {
-      mounted = false;
+      active = false;
       subscription.unsubscribe();
     };
   }, []);
 
-  /* ===================================
-     LOGOUT
-  =================================== */
+  async function login(
+    email: string,
+    password: string,
+  ) {
+    const normalizedEmail =
+      email.trim().toLowerCase();
 
-  const logout = async () => {
-    console.log("Logging out...");
+    if (!normalizedEmail) {
+      throw new Error(
+        "Please enter your email address.",
+      );
+    }
 
-    const { error } = await supabase.auth.signOut();
+    if (!password) {
+      throw new Error(
+        "Please enter your password.",
+      );
+    }
+
+    const { error } =
+      await supabase.auth.signInWithPassword({
+        email: normalizedEmail,
+        password,
+      });
 
     if (error) {
-      console.error("Logout error:", error);
+      throw error;
+    }
+  }
 
+  async function logout() {
+    const { error } =
+      await supabase.auth.signOut();
+
+    if (error) {
       throw error;
     }
 
-    console.log("Supabase session removed.");
-
+    setSession(null);
     setUser(null);
-    setIsLoggedIn(false);
-  };
-
-  /* ===================================
-     PROVIDER
-  =================================== */
+    setLoading(false);
+  }
 
   return (
     <AuthContext.Provider
       value={{
-        user,
-        isLoggedIn,
+        isLoggedIn: Boolean(session),
         loading,
+        user,
+        session,
+        login,
         logout,
       }}
     >
@@ -172,10 +290,13 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 };
 
 export const useAuth = () => {
-  const context = useContext(AuthContext);
+  const context =
+    useContext(AuthContext);
 
   if (!context) {
-    throw new Error("useAuth must be used inside AuthProvider");
+    throw new Error(
+      "useAuth must be used within an AuthProvider",
+    );
   }
 
   return context;

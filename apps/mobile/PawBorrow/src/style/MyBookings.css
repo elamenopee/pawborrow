@@ -104,3 +104,29 @@
   color: #9a9a9a;
   margin-top: 60px;
 }
+.my-bookings-status--pending {
+  background: #fff3cd;
+  color: #9a6700;
+}
+
+.my-bookings-status--confirmed {
+  background: #dff7e8;
+  color: #16834a;
+}
+
+.my-bookings-status--completed {
+  background: #dbeafe;
+  color: #2563eb;
+}
+
+.my-bookings-status--cancelled {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.my-bookings-error {
+  margin: 16px;
+  color: #dc2626;
+  text-align: center;
+  font-size: 14px;
+}

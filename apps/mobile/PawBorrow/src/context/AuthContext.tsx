@@ -8,24 +8,69 @@ import {
 
 import { supabase } from "@repo/api";
 
+/* =====================================
+   TYPES
+===================================== */
+
+type AuthUser =
+  Awaited<
+    ReturnType<typeof supabase.auth.getUser>
+  >["data"]["user"];
+
 type AuthContextType = {
+  user: AuthUser | null;
   isLoggedIn: boolean;
   loading: boolean;
   logout: () => Promise<void>;
 };
 
-const AuthContext =
-  createContext<AuthContextType | undefined>(undefined);
-
-interface AuthProviderProps {
+type AuthProviderProps = {
   children: ReactNode;
-}
+};
+
+/* =====================================
+   CONTEXT
+===================================== */
+
+const AuthContext =
+  createContext<AuthContextType | undefined>(
+    undefined
+  );
+
+/* =====================================
+   USER-SCOPED STORAGE KEY
+===================================== */
+
+export const getUserScopedStorageKey = (
+  baseKey: string,
+  email?: string
+): string => {
+  if (!email) {
+    return baseKey;
+  }
+
+  return `${baseKey}-${email}`;
+};
+
+/* =====================================
+   AUTH PROVIDER
+===================================== */
 
 export const AuthProvider = ({
   children,
 }: AuthProviderProps) => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [user, setUser] =
+    useState<AuthUser | null>(null);
+
+  const [isLoggedIn, setIsLoggedIn] =
+    useState(false);
+
+  const [loading, setLoading] =
+    useState(true);
+
+  /* ===================================
+     CHECK INITIAL SESSION
+  =================================== */
 
   useEffect(() => {
     let mounted = true;
@@ -44,8 +89,16 @@ export const AuthProvider = ({
           );
         }
 
-        if (!mounted) return;
+        if (!mounted) {
+          return;
+        }
 
+        console.log(
+          "Initial Supabase session:",
+          session
+        );
+
+        setUser(session?.user ?? null);
         setIsLoggedIn(!!session);
       } catch (error) {
         console.error(
@@ -53,8 +106,11 @@ export const AuthProvider = ({
           error
         );
 
-        if (!mounted) return;
+        if (!mounted) {
+          return;
+        }
 
+        setUser(null);
         setIsLoggedIn(false);
       } finally {
         if (mounted) {
@@ -65,15 +121,36 @@ export const AuthProvider = ({
 
     checkSession();
 
+    /* =================================
+       LISTEN FOR AUTH CHANGES
+    ================================= */
+
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        if (!mounted) return;
+      (event, session) => {
+        if (!mounted) {
+          return;
+        }
 
+        console.log(
+          "Auth event:",
+          event
+        );
+
+        console.log(
+          "Auth session:",
+          session
+        );
+
+        setUser(session?.user ?? null);
         setIsLoggedIn(!!session);
       }
     );
+
+    /* =================================
+       CLEANUP
+    ================================= */
 
     return () => {
       mounted = false;
@@ -81,19 +158,41 @@ export const AuthProvider = ({
     };
   }, []);
 
+  /* ===================================
+     LOGOUT
+  =================================== */
+
   const logout = async () => {
-    const { error } = await supabase.auth.signOut();
+    console.log("Logging out...");
+
+    const { error } =
+      await supabase.auth.signOut();
 
     if (error) {
+      console.error(
+        "Logout error:",
+        error
+      );
+
       throw error;
     }
 
+    console.log(
+      "Supabase session removed."
+    );
+
+    setUser(null);
     setIsLoggedIn(false);
   };
+
+  /* ===================================
+     PROVIDER
+  =================================== */
 
   return (
     <AuthContext.Provider
       value={{
+        user,
         isLoggedIn,
         loading,
         logout,
@@ -104,8 +203,13 @@ export const AuthProvider = ({
   );
 };
 
+/* =====================================
+   useAuth HOOK
+===================================== */
+
 export const useAuth = () => {
-  const context = useContext(AuthContext);
+  const context =
+    useContext(AuthContext);
 
   if (!context) {
     throw new Error(

@@ -50,18 +50,11 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import Cart from "./pages/Cart";
 
 /* Context */
-import {
-  AuthProvider,
-  useAuth,
-} from "./context/AuthContext";
+import { AuthProvider, useAuth } from "./context/AuthContext";
 
-import {
-  BookingsProvider,
-} from "./context/BookingsContext";
+import { BookingsProvider } from "./context/BookingsContext";
 
-import {
-  CartProvider,
-} from "./context/CartContext";
+import { CartProvider } from "./context/CartContext";
 
 /* Ionic CSS */
 import "@ionic/react/css/core.css";
@@ -105,10 +98,7 @@ const App = () => {
 };
 
 const AppContent = () => {
-  const {
-    isLoggedIn,
-    loading: authLoading,
-  } = useAuth();
+  const { isLoggedIn, loading: authLoading } = useAuth();
 
   /* =====================================
      AUTH LOADING
@@ -118,9 +108,7 @@ const AppContent = () => {
     return (
       <IonApp>
         <div className="flex min-h-screen items-center justify-center bg-white">
-          <span className="text-2xl text-[#442808]">
-            Loading...
-          </span>
+          <span className="text-2xl text-[#442808]">Loading...</span>
         </div>
       </IonApp>
     );
@@ -135,42 +123,20 @@ const AppContent = () => {
       <IonApp>
         <IonReactRouter>
           <IonRouterOutlet>
-
             {/* Login */}
-            <Route
-              path="/login"
-              element={<Login />}
-            />
+            <Route path="/login" element={<Login />} />
 
             {/* Sign Up */}
-            <Route
-              path="/signup"
-              element={<SignUp />}
-            />
+            <Route path="/signup" element={<SignUp />} />
 
             {/* Terms */}
-            <Route
-              path="/terms-of-service"
-              element={<TermsOfService />}
-            />
+            <Route path="/terms-of-service" element={<TermsOfService />} />
 
             {/* Privacy */}
-            <Route
-              path="/privacy-policy"
-              element={<PrivacyPolicy />}
-            />
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
 
             {/* Anything else → Login */}
-            <Route
-              path="*"
-              element={
-                <Navigate
-                  to="/login"
-                  replace
-                />
-              }
-            />
-
+            <Route path="*" element={<Navigate to="/login" replace />} />
           </IonRouterOutlet>
         </IonReactRouter>
       </IonApp>
@@ -184,100 +150,58 @@ const AppContent = () => {
   return (
     <IonApp>
       <IonReactRouter>
-
         <IonTabs>
-
           {/* =================================
               APP ROUTES
           ================================= */}
 
           <IonRouterOutlet>
-
             {/* ================================
                 MAIN TABS
             ================================= */}
 
             {/* Home */}
-            <Route
-              path="/dashboard"
-              element={<Dashboard />}
-            />
+            <Route path="/dashboard" element={<Dashboard />} />
 
             {/* Shop */}
-            <Route
-              path="/shop"
-              element={<Shop />}
-            />
+            <Route path="/shop" element={<Shop />} />
 
             {/* Training */}
-            <Route
-              path="/training"
-              element={<Training />}
-            />
+            <Route path="/training" element={<Training />} />
 
             {/* History */}
-            <Route
-              path="/history"
-              element={<History />}
-            />
+            <Route path="/history" element={<History />} />
 
             {/* Profile */}
-            <Route
-              path="/profile"
-              element={<Profile />}
-            />
+            <Route path="/profile" element={<Profile />} />
 
             {/* ================================
                 OTHER APP PAGES
             ================================= */}
 
             {/* Notifications */}
-            <Route
-              path="/notifications"
-              element={<Notifications />}
-            />
+            <Route path="/notifications" element={<Notifications />} />
 
             {/* Breed Selection */}
-            <Route
-              path="/breed-selection"
-              element={<BreedSelection />}
-            />
+            <Route path="/breed-selection" element={<BreedSelection />} />
 
             {/* Pet Category */}
-            <Route
-              path="/pet-category"
-              element={<PetCategory />}
-            />
+            <Route path="/pet-category" element={<PetCategory />} />
 
             {/* Breed Pets */}
-            <Route
-              path="/breed-pets"
-              element={<BreedPets />}
-            />
+            <Route path="/breed-pets" element={<BreedPets />} />
 
             {/* Pet Details */}
-            <Route
-              path="/pet-details"
-              element={<PetDetails />}
-            />
+            <Route path="/pet-details" element={<PetDetails />} />
 
             {/* Liked Pets */}
-            <Route
-              path="/liked-pets"
-              element={<LikedPets />}
-            />
+            <Route path="/liked-pets" element={<LikedPets />} />
 
             {/* My Bookings */}
-            <Route
-              path="/my-bookings"
-              element={<MyBookings />}
-            />
+            <Route path="/my-bookings" element={<MyBookings />} />
 
             {/* Payment Methods */}
-            <Route
-              path="/payment-methods"
-              element={<PaymentMethods />}
-            />
+            <Route path="/payment-methods" element={<PaymentMethods />} />
 
             {/* Notification Settings */}
             <Route
@@ -286,10 +210,7 @@ const AppContent = () => {
             />
 
             {/* App Settings */}
-            <Route
-              path="/app-settings"
-              element={<AppSettings />}
-            />
+            <Route path="/app-settings" element={<AppSettings />} />
 
             {/* Booking Confirmation */}
             <Route
@@ -298,60 +219,28 @@ const AppContent = () => {
             />
 
             {/* Booking Review */}
-            <Route
-              path="/booking-review"
-              element={<BookingReview />}
-            />
+            <Route path="/booking-review" element={<BookingReview />} />
 
             {/* Cart */}
-            <Route
-              path="/cart"
-              element={<Cart />}
-            />
+            <Route path="/cart" element={<Cart />} />
 
             {/* About Us */}
-            <Route
-              path="/about-us"
-              element={<AboutUs />}
-            />
+            <Route path="/about-us" element={<AboutUs />} />
 
             {/* Terms of Service */}
-            <Route
-              path="/terms-of-service"
-              element={<TermsOfService />}
-            />
+            <Route path="/terms-of-service" element={<TermsOfService />} />
 
             {/* Privacy Policy */}
-            <Route
-              path="/privacy-policy"
-              element={<PrivacyPolicy />}
-            />
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
 
             {/* ================================
                 DEFAULT ROUTE
             ================================= */}
 
-            <Route
-              path="/"
-              element={
-                <Navigate
-                  to="/dashboard"
-                  replace
-                />
-              }
-            />
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />
 
             {/* Unknown route → Dashboard */}
-            <Route
-              path="*"
-              element={
-                <Navigate
-                  to="/dashboard"
-                  replace
-                />
-              }
-            />
-
+            <Route path="*" element={<Navigate to="/dashboard" replace />} />
           </IonRouterOutlet>
 
           {/* =================================
@@ -359,66 +248,37 @@ const AppContent = () => {
           ================================= */}
 
           <IonTabBar slot="bottom">
-
             {/* Home */}
-            <IonTabButton
-              tab="dashboard"
-              href="/dashboard"
-            >
+            <IonTabButton tab="dashboard" href="/dashboard">
               <IonIcon icon={homeOutline} />
-              <IonLabel>
-                Home
-              </IonLabel>
+              <IonLabel>Home</IonLabel>
             </IonTabButton>
 
             {/* Shop */}
-            <IonTabButton
-              tab="shop"
-              href="/shop"
-            >
+            <IonTabButton tab="shop" href="/shop">
               <IonIcon icon={storefrontOutline} />
-              <IonLabel>
-                Shop
-              </IonLabel>
+              <IonLabel>Shop</IonLabel>
             </IonTabButton>
 
             {/* Training */}
-            <IonTabButton
-              tab="training"
-              href="/training"
-            >
+            <IonTabButton tab="training" href="/training">
               <IonIcon icon={schoolOutline} />
-              <IonLabel>
-                Training
-              </IonLabel>
+              <IonLabel>Training</IonLabel>
             </IonTabButton>
 
             {/* History */}
-            <IonTabButton
-              tab="history"
-              href="/history"
-            >
+            <IonTabButton tab="history" href="/history">
               <IonIcon icon={timeOutline} />
-              <IonLabel>
-                History
-              </IonLabel>
+              <IonLabel>History</IonLabel>
             </IonTabButton>
 
             {/* Profile */}
-            <IonTabButton
-              tab="profile"
-              href="/profile"
-            >
+            <IonTabButton tab="profile" href="/profile">
               <IonIcon icon={personOutline} />
-              <IonLabel>
-                Profile
-              </IonLabel>
+              <IonLabel>Profile</IonLabel>
             </IonTabButton>
-
           </IonTabBar>
-
         </IonTabs>
-
       </IonReactRouter>
     </IonApp>
   );
@@ -431,27 +291,17 @@ const AppContent = () => {
 export const SplashScreen = (): JSX.Element => {
   return (
     <div className="splash-screen-frame">
-
       <div className="splash-screen">
-
         {/* Logo */}
         <div className="splash-logo-wrap">
-          <img
-            className="img-photoroom"
-            src={logo}
-            alt="PawBorrow logo"
-          />
+          <img className="img-photoroom" src={logo} alt="PawBorrow logo" />
         </div>
 
         {/* Arch */}
-        <div
-          className="splash-arch"
-          aria-hidden="true"
-        />
+        <div className="splash-arch" aria-hidden="true" />
 
         {/* Pets */}
         <div className="splash-pet-row">
-
           <div className="pet-card">
             <img
               className="pet-photo"
@@ -461,49 +311,29 @@ export const SplashScreen = (): JSX.Element => {
           </div>
 
           <div className="pet-card pet-card--middle">
-            <img
-              className="pet-photo"
-              src={image12}
-              alt="Dog sitting"
-            />
+            <img className="pet-photo" src={image12} alt="Dog sitting" />
           </div>
 
           <div className="pet-card">
             <img
               className="pet-photo"
-              src={
-                closeupShotOneGingerCatHuggingLickingOtherIsolatedWhiteWall1
-              }
+              src={closeupShotOneGingerCatHuggingLickingOtherIsolatedWhiteWall1}
               alt="Cat and dog"
             />
           </div>
-
         </div>
 
         {/* Vector */}
-        <img
-          className="splash-vector"
-          src={vector}
-          alt=""
-          aria-hidden="true"
-        />
+        <img className="splash-vector" src={vector} alt="" aria-hidden="true" />
 
         {/* Pet stand */}
-        <div
-          className="pet-stand"
-          aria-hidden="true"
-        >
-          <div
-            className="pet-stand-inner"
-            aria-hidden="true"
-          />
+        <div className="pet-stand" aria-hidden="true">
+          <div className="pet-stand-inner" aria-hidden="true" />
         </div>
 
         {/* Bottom bar */}
         <div className="splash-bottom-bar" />
-
       </div>
-
     </div>
   );
 };

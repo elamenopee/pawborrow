@@ -33,6 +33,11 @@ export * from "./lib/pets/useAdminPets";
 export * from "./lib/pets/useUpdatePetStatus";
 export * from "./lib/pets/usePetRealTime";
 export * from "./lib/booking/useAdminRescheduleBooking";
+export * from "./lib/pets/useAdminPets";
+export * from "./lib/pets/useUpdatePetStatus";
+export * from "./lib/pets/useCreatePet";
+export * from "./lib/pets/useUpdatePet";
+export * from "./lib/pets/useDeletePet";
 
 export * from "./lib/likedpets/likedPet";
 export * from "./lib/likedpets/useLikedPets";
@@ -42,3 +47,4 @@ export * from "./lib/likedpets/useRemoveLikedPet";
 export * from "./lib/notifications/notification";
 export * from "./lib/notifications/useNotifications";
 export * from "./lib/notifications/useMarkNotificationRead";
+

@@ -14,6 +14,7 @@ import {
 import { IonReactRouter } from "@ionic/react-router";
 
 import Login from "./pages/Login";
+import SignUp from "./pages/SignUp";
 import Dashboard from "./pages/Dashboard";
 import Notification from "./pages/Notification";
 import History from "./pages/History";
@@ -113,6 +114,11 @@ const AppContent: React.FC = () => {
             <Route
               path="/login"
               element={<Login />}
+            />
+
+            <Route
+              path="/signup"
+              element={<SignUp />}
             />
 
             <Route
@@ -262,6 +268,16 @@ const AppContent: React.FC = () => {
 
           <Route
             path="/login"
+            element={
+              <Navigate
+                to="/dashboard"
+                replace
+              />
+            }
+          />
+
+          <Route
+            path="/signup"
             element={
               <Navigate
                 to="/dashboard"

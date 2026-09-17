@@ -123,6 +123,8 @@ function mapPetRow(pet: any): Pet {
 }
 
 // Customer-facing: available pets only.
+// Customer-facing: show all pets with their current status.
+
 export async function getPets(): Promise<
   Pet[]
 > {
@@ -130,7 +132,6 @@ export async function getPets(): Promise<
     await supabase
       .from("pet")
       .select(PET_SELECT)
-      .eq("status", "available")
       .order("created_at", {
         ascending: false,
       });

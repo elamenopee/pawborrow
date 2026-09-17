@@ -1,7 +1,8 @@
 import placeholderPhoto from '../assets/images/utils/placeholder.png';
 
 export type PetCategory = 'Cat' | 'Dog' | 'Rabbit' | 'Guinea Pig';
-export type PetStatus = 'Available' | 'Unavailable';
+
+export type PetStatus = 'available' | 'unavailable' | 'booked';
 
 export interface Pet {
   id: string;
@@ -31,8 +32,9 @@ export const pets: Pet[] = [
     image: placeholderPhoto,
     age: '2 y/o',
     personality: 'Gentle',
-    status: 'Available',
-    about: 'Haru is a Sphinx cat with a calm personality and enjoys cozy afternoons with gentle attention.',
+    status: 'available',
+    about:
+      'Haru is a Sphinx cat with a calm personality and enjoys cozy afternoons with gentle attention.',
     availableMonth: 'March, 2024',
     availableDays: [
       { day: 'Mon', date: '4' },
@@ -53,8 +55,9 @@ export const pets: Pet[] = [
     image: placeholderPhoto,
     age: '5 y/o',
     personality: 'Affectionate',
-    status: 'Available',
-    about: 'Mitski is a Persian cat who loves soft blankets, quiet rooms, and lots of calm companionship.',
+    status: 'available',
+    about:
+      'Mitski is a Persian cat who loves soft blankets, quiet rooms, and lots of calm companionship.',
     availableMonth: 'March, 2024',
     availableDays: [
       { day: 'Tue', date: '5' },
@@ -75,8 +78,9 @@ export const pets: Pet[] = [
     image: placeholderPhoto,
     age: '3 y/o',
     personality: 'Playful',
-    status: 'Available',
-    about: 'Biscuit is a curious Siamese cat who follows people around and enjoys interactive playtime.',
+    status: 'available',
+    about:
+      'Biscuit is a curious Siamese cat who follows people around and enjoys interactive playtime.',
     availableMonth: 'March, 2024',
     availableDays: [
       { day: 'Wed', date: '6' },
@@ -97,8 +101,9 @@ export const pets: Pet[] = [
     image: placeholderPhoto,
     age: '4 y/o',
     personality: 'Shy',
-    status: 'Unavailable',
-    about: 'Momo is a British Shorthair who warms up slowly but becomes a sweet companion with patience and trust.',
+    status: 'unavailable',
+    about:
+      'Momo is a British Shorthair who warms up slowly but becomes a sweet companion with patience and trust.',
     availableMonth: 'April, 2024',
     availableDays: [
       { day: 'Tue', date: '16' },
@@ -119,8 +124,9 @@ export const pets: Pet[] = [
     image: placeholderPhoto,
     age: '3 y/o',
     personality: 'Gentle',
-    status: 'Available',
-    about: 'Luna is an energetic Golden Retriever with a warm heart and a love for outdoor walks and games.',
+    status: 'available',
+    about:
+      'Luna is an energetic Golden Retriever with a warm heart and a love for outdoor walks and games.',
     availableMonth: 'March, 2024',
     availableDays: [
       { day: 'Fri', date: '8' },
@@ -141,8 +147,9 @@ export const pets: Pet[] = [
     image: placeholderPhoto,
     age: '2 y/o',
     personality: 'Playful',
-    status: 'Available',
-    about: 'Milo is a cheerful Corgi who brings joy to every room and loves short, fun adventures.',
+    status: 'available',
+    about:
+      'Milo is a cheerful Corgi who brings joy to every room and loves short, fun adventures.',
     availableMonth: 'March, 2024',
     availableDays: [
       { day: 'Mon', date: '11' },
@@ -163,8 +170,9 @@ export const pets: Pet[] = [
     image: placeholderPhoto,
     age: '4 y/o',
     personality: 'Affectionate',
-    status: 'Available',
-    about: 'Nala is a Shih Tzu who thrives on affection and enjoys being close to her favorite people.',
+    status: 'available',
+    about:
+      'Nala is a Shih Tzu who thrives on affection and enjoys being close to her favorite people.',
     availableMonth: 'April, 2024',
     availableDays: [
       { day: 'Thu', date: '18' },
@@ -185,8 +193,9 @@ export const pets: Pet[] = [
     image: placeholderPhoto,
     age: '1 y/o',
     personality: 'Chaotic',
-    status: 'Available',
-    about: 'Coco is a bright and active Poodle who loves movement, toys, and learning new tricks.',
+    status: 'available',
+    about:
+      'Coco is a bright and active Poodle who loves movement, toys, and learning new tricks.',
     availableMonth: 'April, 2024',
     availableDays: [
       { day: 'Sat', date: '20' },
@@ -207,8 +216,9 @@ export const pets: Pet[] = [
     image: placeholderPhoto,
     age: '1 y/o',
     personality: 'Gentle',
-    status: 'Available',
-    about: 'Pippin is a calm American guinea pig who enjoys quiet spaces and gentle handling.',
+    status: 'available',
+    about:
+      'Pippin is a calm American guinea pig who enjoys quiet spaces and gentle handling.',
     availableMonth: 'May, 2024',
     availableDays: [
       { day: 'Tue', date: '7' },
@@ -229,8 +239,9 @@ export const pets: Pet[] = [
     image: placeholderPhoto,
     age: '2 y/o',
     personality: 'Playful',
-    status: 'Available',
-    about: 'Pepper is a lively Abyssinian guinea pig who loves exploring and keeping busy with toys.',
+    status: 'available',
+    about:
+      'Pepper is a lively Abyssinian guinea pig who loves exploring and keeping busy with toys.',
     availableMonth: 'May, 2024',
     availableDays: [
       { day: 'Wed', date: '8' },
@@ -251,8 +262,9 @@ export const pets: Pet[] = [
     image: placeholderPhoto,
     age: '3 y/o',
     personality: 'Affectionate',
-    status: 'Unavailable',
-    about: 'Maple is a sweet Peruvian guinea pig who loves attention and snuggly, peaceful routines.',
+    status: 'unavailable',
+    about:
+      'Maple is a sweet Peruvian guinea pig who loves attention and snuggly, peaceful routines.',
     availableMonth: 'May, 2024',
     availableDays: [
       { day: 'Thu', date: '9' },
@@ -273,8 +285,9 @@ export const pets: Pet[] = [
     image: placeholderPhoto,
     age: '2 y/o',
     personality: 'Gentle',
-    status: 'Available',
-    about: 'Berry is a gentle Holland Lop rabbit who enjoys soft spaces and calm, patient handling.',
+    status: 'available',
+    about:
+      'Berry is a gentle Holland Lop rabbit who enjoys soft spaces and calm, patient handling.',
     availableMonth: 'June, 2024',
     availableDays: [
       { day: 'Mon', date: '3' },
@@ -295,8 +308,9 @@ export const pets: Pet[] = [
     image: placeholderPhoto,
     age: '1 y/o',
     personality: 'Playful',
-    status: 'Available',
-    about: 'Daisy is a lively Netherland Dwarf rabbit who loves hopping around and exploring new spaces.',
+    status: 'available',
+    about:
+      'Daisy is a lively Netherland Dwarf rabbit who loves hopping around and exploring new spaces.',
     availableMonth: 'June, 2024',
     availableDays: [
       { day: 'Tue', date: '4' },
@@ -317,8 +331,9 @@ export const pets: Pet[] = [
     image: placeholderPhoto,
     age: '3 y/o',
     personality: 'Shy',
-    status: 'Available',
-    about: 'Juniper is a soft Rex rabbit who prefers gentle routines and calm interaction.',
+    status: 'available',
+    about:
+      'Juniper is a soft Rex rabbit who prefers gentle routines and calm interaction.',
     availableMonth: 'June, 2024',
     availableDays: [
       { day: 'Wed', date: '5' },

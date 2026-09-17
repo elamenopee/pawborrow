@@ -32,6 +32,7 @@ import BookingConfirmation from "./pages/BookingConfirmation";
 import BookingReview from "./pages/BookingReview";
 import TermsOfService from "./pages/TermsOfService";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
+import Review from "./pages/Review";
 
 import BottomNav from "./components/BottomNav";
 import {
@@ -214,6 +215,11 @@ const AppContent: React.FC = () => {
             path="/my-bookings"
             element={<MyBookings />}
           />
+
+          <Route
+  path="/review/:bookingId"
+  element={<Review />}
+/>
 
           <Route
             path="/payment-methods"

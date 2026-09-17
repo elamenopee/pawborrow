@@ -8,6 +8,7 @@ import {
   chevronBackOutline,
   calendarOutline,
   timeOutline,
+  starOutline,
 } from "ionicons/icons";
 import {
   useMutation,
@@ -19,7 +20,10 @@ import {
   type Booking,
 } from "@repo/api";
 
-import {getPetImage, handlePetImageError,} from "../utils/petImage";
+import {
+  getPetImage,
+  handlePetImageError,
+} from "../utils/petImage";
 import "../style/MyBookings.css";
 
 function formatBookingDate(date: string) {
@@ -91,6 +95,10 @@ function canCancelBooking(booking: Booking) {
   );
 }
 
+function canReviewBooking(_booking: Booking) {
+  return true;
+}
+
 const MyBookings = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -140,6 +148,17 @@ const MyBookings = () => {
     }
 
     cancelBookingMutation.mutate(bookingId);
+  }
+
+  function handleReviewBooking(booking: Booking) {
+    navigate(`/review/${booking.booking_id}`, {
+      state: {
+        booking: {
+          booking_id: booking.booking_id,
+          pet: booking.pet,
+        },
+      },
+    });
   }
 
   return (
@@ -213,17 +232,19 @@ const MyBookings = () => {
                       className="my-bookings-card"
                       key={booking.booking_id}
                     >
-                     <img
-                            src={getPetImage(
-                              booking.pet?.image_url,
-                            )}
-                            alt={
-                              booking.pet?.name ??
-                              "Pet"
-                            }
-                            loading="lazy"
-                            onError={handlePetImageError}
-                          />
+                      <img
+                        src={getPetImage(
+                          booking.pet?.image_url,
+                        )}
+                        alt={
+                          booking.pet?.name ??
+                          "Pet"
+                        }
+                        loading="lazy"
+                        onError={
+                          handlePetImageError
+                        }
+                      />
 
                       <div className="my-bookings-info">
                         <p className="my-bookings-name">
@@ -295,6 +316,26 @@ const MyBookings = () => {
                           {isCancelling
                             ? "Cancelling..."
                             : "Cancel"}
+                        </button>
+                      )}
+
+                      {canReviewBooking(
+                        booking,
+                      ) && (
+                        <button
+                          type="button"
+                          className="my-bookings-review"
+                          onClick={() =>
+                            handleReviewBooking(
+                              booking,
+                            )
+                          }
+                        >
+                          <IonIcon
+                            icon={starOutline}
+                          />
+
+                          Review
                         </button>
                       )}
                     </div>

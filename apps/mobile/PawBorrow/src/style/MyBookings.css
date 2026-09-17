@@ -130,3 +130,26 @@
   text-align: center;
   font-size: 14px;
 }
+
+.my-bookings-review {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 4px;
+  padding: 7px 11px;
+  border: none;
+  border-radius: 10px;
+  background: #f5821f;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.my-bookings-review ion-icon {
+  font-size: 14px;
+}
+
+.my-bookings-review:hover {
+  background: #df7015;
+}

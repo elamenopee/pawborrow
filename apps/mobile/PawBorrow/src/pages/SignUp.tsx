@@ -11,7 +11,7 @@ import {
   personOutline,
 } from "ionicons/icons";
 
-import logo from "../assets/images/logo.png";
+const logo = "/images/logo.png";
 
 import { signUp, signInWithGoogle } from "@repo/api";
 

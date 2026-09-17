@@ -268,6 +268,19 @@ const Login: React.FC = () => {
           </button>
 
           <p className="login-footer">
+            Don&apos;t have an account?{" "}
+
+            <button
+              type="button"
+              className="login-terms-link"
+              onClick={() => navigate("/signup")}
+              disabled={isBusy}
+            >
+              Sign Up
+            </button>
+          </p>
+
+          <p className="login-footer">
             By continuing, you agree to
             our
             <br />

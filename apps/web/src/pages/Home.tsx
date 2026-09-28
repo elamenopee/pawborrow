@@ -345,7 +345,7 @@ function SecondaryHero() {
         </h2>
 
         <div className="grid w-full grid-cols-4 grid-rows-3 auto-cols-fr gap-5">
-          <div className="relative bg-yellow-200 rounded-2xl p-6 flex flex-col justify-between col-span-1 border border-solid border-alabaster-100">
+          <div className="relative bg-buttermilk-100 rounded-2xl p-6 flex flex-col justify-between col-span-1 border border-solid border-buttermilk-200">
             <img
               src="https://cdn.prod.website-files.com/6350808bc45bd0c902af10e6/66a8d432caf424cb1ac3df5d_doodle-customer-stories.png"
               loading="lazy"
@@ -358,7 +358,7 @@ function SecondaryHero() {
             </div>
           </div>
 
-          <div className="bg-green-200 rounded-2xl p-6 flex flex-col justify-between col-span-1 border border-solid border-alabaster-100">
+          <div className="bg-green-200 rounded-2xl p-6 flex flex-col justify-between col-span-1 border border-solid border-green-300">
             <div>
               <div className="text-4xl font-medium text-neutral-900">15+</div>
               <div className="text-sm text-neutral-600 mt-1">
@@ -374,7 +374,7 @@ function SecondaryHero() {
             <div className="flex items-center justify-between mt-6">
               <div className="flex items-center gap-3">
                 <img
-                  src=""
+                  src="https://scontent.fmnl17-7.fna.fbcdn.net/v/t39.30808-1/783592802_3517688435060252_4609188231982537434_n.jpg?stp=c13.0.816.816a_dst-jpg_tt6&cstp=mx816x816&ctp=s200x200&_nc_cat=101&_nc_map=urlgen_bucketless&ccb=1-7&_nc_sid=e99d92&_nc_eui2=AeEx9fc4N0HK1yCxchAFxePgHChCmCDQIyocKEKYINAjKih0M79PCL3g0YyD6hf0e34uIPhuYYg78dN2-cyvjmVa&_nc_ohc=LBuUJQ6Iz6EQ7kNvwEhqkLF&_nc_oc=Adq_fZVnehVJSa3yPgXjDqgjtX-uee28ORRSVcEXzq-GEB3tJculUGXrDrIi_q65gKc&_nc_zt=24&_nc_ht=scontent.fmnl17-7.fna&_nc_gid=nXBxv0ASKYtNMKcN9t-2Kg&_nc_ss=7b2a8&oh=00_AQMBu9RgWuPFBYk4qL95o366m4rgsFNTnvB5rBBx-Oq2LQ&oe=6ABFEAFChttps://scontent.fmnl17-7.fna.fbcdn.net/v/t39.3080…uPFBYk4qL95o366m4rgsFNTnvB5rBBx-Oq2LQ&oe=6ABFEAFC"
                   className="w-9 h-9 rounded-full object-cover"
                 />
                 <div>
@@ -393,19 +393,19 @@ function SecondaryHero() {
             <div className="flex items-center justify-between mt-6">
               <div className="flex items-center gap-3">
                 <img
-                  src=""
+                  src="https://scontent.fmnl17-6.fna.fbcdn.net/v/t39.30808-1/716571071_4600117790211645_7153780190225959391_n.jpg?stp=dst-jpg_tt6&cstp=mx960x960&ctp=s200x200&_nc_cat=110&_nc_map=urlgen_bucketless&ccb=1-7&_nc_sid=e99d92&_nc_eui2=AeGpuxIksNJxU6gkTroagCypF8iDrurOFREXyIOu6s4VEb6r_z4jCOptolo4qzQBWn3Y1QjGom4hHb7ZKsRHqCAM&_nc_ohc=qEeF7R7E9REQ7kNvwEvf39I&_nc_oc=AdrSd1k0p52msOyZ49p8XmcrbZO9ChHokQgT4iywN-2MLovxy2a8WcOyA-mDSDjuHvM&_nc_zt=24&_nc_ht=scontent.fmnl17-6.fna&_nc_gid=n_Bv9PoIx1e43a9ddQ6w6w&_nc_ss=7b2a8&oh=00_AQOGYwgOMKg70EzIB8Kop95DJnHBAcmiChbvMBPtX9u7sw&oe=6ABFEADE"
                   className="w-9 h-9 rounded-full object-cover"
                 />
                 <div>
                   <div className="text-sm font-medium text-neutral-900">
-                    Gwen
+                    Steven
                   </div>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="bg-yellow-200 rounded-2xl p-6 flex flex-col justify-between col-span-1 border border-solid border-alabaster-100">
+          <div className="bg-buttermilk-100 rounded-2xl p-6 flex flex-col justify-between col-span-1 border border-solid border-buttermilk-200">
             <div>
               <div className="text-4xl font-medium text-neutral-900">₱250-350</div>
               <div className="text-sm text-neutral-600 mt-1">
@@ -414,7 +414,7 @@ function SecondaryHero() {
             </div>
           </div>
 
-          <div className="bg-pink-200 rounded-2xl p-6 flex flex-col justify-between col-span-1 border border-solid border-alabaster-100">
+          <div className="bg-pink-200 rounded-2xl p-6 flex flex-col justify-between col-span-1 border border-solid border-pink-300">
             <div>
               <div className="text-4xl font-medium text-neutral-900">Free</div>
               <div className="text-sm text-neutral-600 mt-1">
@@ -423,7 +423,7 @@ function SecondaryHero() {
             </div>
           </div>
 
-          <div className="bg-indigo-100 rounded-2xl p-6 flex flex-col justify-between col-span-1 border border-solid border-alabaster-100">
+          <div className="bg-boston-blue-200 rounded-2xl p-6 flex flex-col justify-between col-span-1 border border-solid border-boston-blue-300">
             <div>
               <div className="text-4xl font-medium text-neutral-900">100+</div>
               <div className="text-sm text-neutral-600 mt-1">
@@ -432,7 +432,7 @@ function SecondaryHero() {
             </div>
           </div>
 
-          <div className="bg-pink-200 rounded-2xl p-6 flex flex-col justify-between col-span-1 border border-solid border-alabaster-100">
+          <div className="bg-pink-200 rounded-2xl p-6 flex flex-col justify-between col-span-1 border border-solid border-pink-300">
             <div>
               <div className="text-4xl font-medium text-neutral-900">2x</div>
               <div className="text-sm text-neutral-600 mt-1">Customer base</div>
@@ -446,7 +446,7 @@ function SecondaryHero() {
             <div className="flex items-center justify-between mt-6">
               <div className="flex items-center gap-3">
                 <img
-                  src=""
+                  src="https://instagram.fmnl17-8.fna.fbcdn.net/v/t51.82787-19/650989629_18409196179192186_2757636846098001513_n.jpg?stp=dst-jpg_s150x150_tt6&_nc_cat=106&_nc_map=urlgen_bucketless&ccb=7-5&_nc_sid=f7ccc5&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy4xMDgwLkMzIn0%3D&_nc_ohc=Xd8r0uTJ-kkQ7kNvwG58yvL&_nc_oc=AdrVs-XylyzuLlAMv1Zeu1b98wteD6lBOd1L22pp4ID36FRfEAAcM3Et62MPkYNq1VY&_nc_zt=24&_nc_ht=instagram.fmnl17-8.fna&_nc_gid=xDtzpzTnNv2vcaMsASmKCA&_nc_ss=7baaf&oh=00_AQOWn-IXAwQvp1fRKdMk4ElH0NB-QBrYJrmmueu8kLgdEA&oe=6ABFDAE7"
                   className="w-9 h-9 rounded-full object-cover"
                 />
                 <div>

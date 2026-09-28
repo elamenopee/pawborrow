@@ -50,3 +50,5 @@ export * from "./lib/notifications/useMarkNotificationRead";
 
 export * from "./lib/dashboard/dashboard";
 export * from "./lib/dashboard/useDashboard";
+
+export * from "./lib/notifications/notification";

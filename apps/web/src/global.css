@@ -10,7 +10,6 @@ html::-webkit-scrollbar {
   display: none;
 }
 
-
 /*
 Source - https://stackoverflow.com/a/79650025
 Posted by rozsazoltan, modified by community. See post 'Timeline' for change history
@@ -60,9 +59,59 @@ Retrieved 2026-09-02, License - CC BY-SA 4.0
   --color-froly-900: #7d1f21;
   --color-froly-950: #440b0c;
 
+  --color-boston-blue-50: #effafc;
+  --color-boston-blue-100: #d6f0f7;
+  --color-boston-blue-200: #b1e2f0;
+  --color-boston-blue-300: #7ccce4;
+  --color-boston-blue-400: #3fadd1;
+  --color-boston-blue-500: #2596be;
+  --color-boston-blue-600: #20749a;
+  --color-boston-blue-700: #215f7d;
+  --color-boston-blue-800: #234f67;
+  --color-boston-blue-900: #214358;
+  --color-boston-blue-950: #112a3b;
+  --color-sherpa-blue-800: #11515a;
+
+  --color-tuft-bush-50: #fff3ed;
+  --color-tuft-bush-100: #ffe8db;
+  --color-tuft-bush-200: #fec5aa;
+  --color-tuft-bush-300: #fd9d74;
+  --color-tuft-bush-400: #fb6a3c;
+  --color-tuft-bush-500: #f94316;
+  --color-tuft-bush-600: #ea290c;
+  --color-tuft-bush-700: #c21b0c;
+  --color-tuft-bush-800: #9a1712;
+  --color-tuft-bush-900: #7c1712;
+  --color-tuft-bush-950: #430707;
+  --color-rust-700: #b64016;
+
+  --color-buttermilk-50: #fffbeb;
+  --color-buttermilk-100: #fcedb6;
+  --color-buttermilk-200: #fae38d;
+  --color-buttermilk-300: #f8ce51;
+  --color-buttermilk-400: #f6ba29;
+  --color-buttermilk-500: #f09a10;
+  --color-buttermilk-600: #d4740b;
+  --color-buttermilk-700: #b0510d;
+  --color-buttermilk-800: #8f3f11;
+  --color-buttermilk-900: #763411;
+  --color-buttermilk-950: #441904;
+  --color-rusty-nail-900: #805900;
+
+  --color-alabaster-50: #fbfaf9;
+  --color-alabaster-100: #eeeae6;
+  --color-alabaster-200: #dcd4cc;
+  --color-alabaster-300: #c6b7ab;
+  --color-alabaster-400: #af9788;
+  --color-alabaster-500: #9e8171;
+  --color-alabaster-600: #917265;
+  --color-alabaster-700: #795d55;
+  --color-alabaster-800: #644d48;
+  --color-alabaster-900: #52403c;
+  --color-alabaster-950: #2b211f;
+
   --shadow-card: 0 2px 12px 0 rgba(0, 0, 0, 0.078);
 }
-
 
 @utility nav-link {
   @apply relative text-froly-400
@@ -78,4 +127,3 @@ Retrieved 2026-09-02, License - CC BY-SA 4.0
     hover:after:w-full
     hover:after:left-0;
 }
-

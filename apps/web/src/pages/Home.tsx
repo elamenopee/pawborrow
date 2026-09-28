@@ -125,7 +125,9 @@ function Hero() {
           Pet companionship, <br /> borrowed <span>your way.</span>
         </h1>
         <p className="hero__sub">
-          Not ready to commit to full-time pet ownership? Borrow a cat, dog, rabbit, and capybara for a day, a weekend, or however long you need the company.
+          Not ready to commit to full-time pet ownership? Borrow a cat, dog,
+          rabbit, and capybara for a day, a weekend, or however long you need
+          the company.
         </p>
         <div className="hero__actions">
           <Link
@@ -150,17 +152,10 @@ function Hero() {
 }
 
 function Categories() {
-  const {
-    data: pets = [],
-    isLoading,
-    error,
-  } = usePets();
+  const { data: pets = [], isLoading, error } = usePets();
 
   return (
-    <section
-      id="browse"
-      className="section categories"
-    >
+    <section id="browse" className="section categories">
       <div className="section__head">
         <h2>Browse by companion</h2>
       </div>
@@ -178,18 +173,12 @@ function Categories() {
           const count = pets.filter(
             (pet) =>
               pet.category?.trim().toLowerCase() ===
-              category.filterCategory
-                .trim()
-                .toLowerCase(),
+              category.filterCategory.trim().toLowerCase(),
           ).length;
 
           const countLabel = isLoading
             ? "Loading..."
-            : `${count} ${
-                count === 1
-                  ? "companion"
-                  : "companions"
-              }`;
+            : `${count} ${count === 1 ? "companion" : "companions"}`;
 
           return (
             <Link
@@ -212,10 +201,7 @@ function Categories() {
                   <p>{countLabel}</p>
                 </div>
 
-                <span
-                  className="category-card__arrow"
-                  aria-hidden="true"
-                >
+                <span className="category-card__arrow" aria-hidden="true">
                   →
                 </span>
               </div>
@@ -296,53 +282,186 @@ function SecondaryHero() {
       </h2>
       <p className="text-center text-sm sm:text-base font-inter text-[#696969] mb-6"></p>
 
-      <div className="container px-0 my-16">
+      <div className="container px-0 my-16 pb-15">
         <div className="flex flex-wrap justify-center gap-8">
-          <div className="shadow-xl flex flex-col items-center px-4 py-6 w-62.5 h-57.5 md:w-75 md:h-70 bg-white rounded-3xl font-inter">
-            <MapPin size={36} className="text-froly-300 mt-2" />
-            <h3 className="text-base md:text-xl mt-4 md:mt-7 font-inter text-froly-400 font-bold text-center mb-4 tracking-tighter">Pick a Buddy</h3>
-            <p className="text-sm md:text-base font-inter text-froly-300 text-justify leading-6">Pick the perfect companion for your needs.</p>
+          <div className="shadow-xl flex flex-col items-center px-4 py-6 w-62.5 h-57.5 md:w-75 md:h-70 bg-boston-blue-50 rounded-3xl font-inter">
+            <MapPin size={36} className="text-sherpa-blue-800 mt-2" />
+            <h3 className="text-base md:text-xl mt-4 md:mt-7 font-inter text-sherpa-blue-800 font-bold text-center mb-4 tracking-tighter">
+              Pick a Buddy
+            </h3>
+            <p className="text-sm md:text-base font-inter text-sherpa-blue-800 text-justify leading-6">
+              Pick the perfect companion for your needs.
+            </p>
           </div>
-          <div className="shadow-xl flex flex-col items-center px-4 py-6 w-62.5 h-57.5 md:w-75 md:h-70 bg-white rounded-3xl font-inter">
-             <CalendarDays size={36} className="text-froly-300 mt-2" />
-            <h3 className="text-base md:text-xl mt-4 md:mt-7 font-inter text-froly-400 font-bold text-center mb-4 tracking-tighter">Choose your Dates</h3>
-            <p className="text-sm md:text-base font-inter text-froly-300 text-justify leading-6">Choose the dates you want a buddy for.</p>
+          <div className="shadow-xl flex flex-col items-center px-4 py-6 w-62.5 h-57.5 md:w-75 md:h-70 bg-tuft-bush-100 rounded-3xl font-inter">
+            <CalendarDays size={36} className="text-rust-700 mt-2" />
+            <h3 className="text-base md:text-xl mt-4 md:mt-7 font-inter text-rust-700 font-bold text-center mb-4 tracking-tighter">
+              Choose your Dates
+            </h3>
+            <p className="text-sm md:text-base font-inter text-rust-700 text-justify leading-6">
+              Choose the dates you want a buddy for.
+            </p>
           </div>
-          <div className="shadow-xl flex flex-col items-center px-4 py-6 w-62.5 h-57.5 md:w-75 md:h-70 bg-white rounded-3xl font-inter">
-             <PawPrint size={36} className="text-froly-300 mt-2" />
-            <h3 className="text-base md:text-xl mt-4 md:mt-7 font-inter text-froly-400 font-bold text-center mb-4 tracking-tighter">We handle the rest</h3>
-            <p className="text-sm md:text-base font-inter text-froly-300 text-justify leading-6">Food, leash, bed, and care instructions included. Return them when your time's up</p>
+          <div className="shadow-xl flex flex-col items-center px-4 py-6 w-62.5 h-57.5 md:w-75 md:h-70 bg-buttermilk-100 rounded-3xl font-inter">
+            <PawPrint size={36} className="text-rusty-nail-900 -300 mt-2" />
+            <h3 className="text-base md:text-xl mt-4 md:mt-7 font-inter text-rusty-nail-900 font-bold text-center mb-4 tracking-tighter">
+              We handle the rest
+            </h3>
+            <p className="text-sm md:text-base font-inter text-rusty-nail-900 text-justify leading-6">
+              Food, leash, bed, and care instructions included. Return them when
+              your time's up
+            </p>
           </div>
         </div>
       </div>
 
-
-      <div className="container px-0 my-10 text-center">
+      <div className="container px-0 my-10 text-center pb-15">
         <h1 className="text-1xl xs:text-4xl lg:text-5xl text-froly-400 tracking-tighter gap-2 font-bold text-center mb-2 flex flex-row items-center justify-center">
           Why
           <span className="text-black">choose</span>
           <img src="/images/PawLogo2.png" alt="icon" />
         </h1>
-         <h3 className=" hidden md:block font-bold text-2xl md:text-3xl text-background mt-3">
-          With the most fluffy poodles, and clingy cats 
+
+        <p className="text-justify sm:text-center text-sm sm:text-base font-inter text-[#696969] mt-3">
+          At PawBorrow, we believe everyone deserves the joy of animal
+          companionship without the lifelong commitment.
           <br className="hidden lg:block" />
-          you should get your fair share of cuddles at PawBorrow.
-         </h3>
-         <p className="text-justify sm:text-center text-sm sm:text-base font-inter text-[#696969] mt-3">
-          At PawBorrow, we believe everyone deserves the joy of animal companionship without the lifelong commitment. 
+          Whether you're seeking emotional support, a moment of relaxation, or
+          therapeutic comfort,
           <br className="hidden lg:block" />
-          Whether you're seeking emotional support, a moment of relaxation, or therapeutic comfort,
+          our lovingly cared-for fleet of cats, dogs, rabbits, and capybaras is
+          ready to brighten your day.
           <br className="hidden lg:block" />
-          our lovingly cared-for fleet of cats, dogs, rabbits, and capybaras is ready to brighten your day. 
+          As a proudly Quezon City-based service, we make companionship
+          effortless.
           <br className="hidden lg:block" />
-          As a proudly Quezon City-based service, we make companionship effortless.
-          <br className="hidden lg:block" />
-          </p>
+        </p>
+      </div>
+
+      <div className="gap-14 items-center flex relative flex-col">
+        <h2 className="text-3xl xs:text-4xl lg:text-5xl text-froly-400 tracking-tighter font-bold text-center mb-2">
+          <span className="text-brand">What</span>
+          <span className="text-gray-900"> our customers say</span>
+        </h2>
+
+        <div className="grid w-full grid-cols-4 grid-rows-3 auto-cols-fr gap-5">
+          <div className="relative bg-yellow-200 rounded-2xl p-6 flex flex-col justify-between col-span-1 border border-solid border-alabaster-100">
+            <img
+              src="https://cdn.prod.website-files.com/6350808bc45bd0c902af10e6/66a8d432caf424cb1ac3df5d_doodle-customer-stories.png"
+              loading="lazy"
+              sizes="100vw"
+              className="absolute pointer-events-none z-1 w-46.5 top-[-95%] left-[-2%]"
+            />
+            <div>
+              <div className="text-4xl font-medium text-neutral-900">50+</div>
+              <div className="text-sm text-neutral-600 mt-1">Available Pets</div>
+            </div>
+          </div>
+
+          <div className="bg-green-200 rounded-2xl p-6 flex flex-col justify-between col-span-1 border border-solid border-alabaster-100">
+            <div>
+              <div className="text-4xl font-medium text-neutral-900">15+</div>
+              <div className="text-sm text-neutral-600 mt-1">
+                Different Breeds
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-neutral-100 rounded-2xl p-6 flex flex-col justify-between col-span-2 border border-solid border-alabaster-100">
+            <p className="text-neutral-900 leading-relaxed">
+              "Spending the afternoon with Bella was such a lovely experience. Booking was easy, and we got all the details we needed before meeting her. She made our weekend feel extra special."
+            </p>
+            <div className="flex items-center justify-between mt-6">
+              <div className="flex items-center gap-3">
+                <img
+                  src=""
+                  className="w-9 h-9 rounded-full object-cover"
+                />
+                <div>
+                  <div className="text-sm font-medium text-neutral-900">
+                    Joanna Marie
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-neutral-100 rounded-2xl p-6 flex flex-col justify-between col-span-2 border border-solid border-alabaster-100">
+            <p className="text-neutral-900 leading-relaxed">
+              “Our family had a wonderful time with Luna. She was sweet, playful, and comfortable around the kids. The whole process felt simple, from choosing a pet to arranging our visit.”
+            </p>
+            <div className="flex items-center justify-between mt-6">
+              <div className="flex items-center gap-3">
+                <img
+                  src=""
+                  className="w-9 h-9 rounded-full object-cover"
+                />
+                <div>
+                  <div className="text-sm font-medium text-neutral-900">
+                    Gwen
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-yellow-200 rounded-2xl p-6 flex flex-col justify-between col-span-1 border border-solid border-alabaster-100">
+            <div>
+              <div className="text-4xl font-medium text-neutral-900">₱250-350</div>
+              <div className="text-sm text-neutral-600 mt-1">
+                Per Session
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-pink-200 rounded-2xl p-6 flex flex-col justify-between col-span-1 border border-solid border-alabaster-100">
+            <div>
+              <div className="text-4xl font-medium text-neutral-900">Free</div>
+              <div className="text-sm text-neutral-600 mt-1">
+                Pet Kit's per session
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-indigo-100 rounded-2xl p-6 flex flex-col justify-between col-span-1 border border-solid border-alabaster-100">
+            <div>
+              <div className="text-4xl font-medium text-neutral-900">100+</div>
+              <div className="text-sm text-neutral-600 mt-1">
+                Bookings
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-pink-200 rounded-2xl p-6 flex flex-col justify-between col-span-1 border border-solid border-alabaster-100">
+            <div>
+              <div className="text-4xl font-medium text-neutral-900">2x</div>
+              <div className="text-sm text-neutral-600 mt-1">Customer base</div>
+            </div>
+          </div>
+
+          <div className="bg-neutral-100 rounded-2xl p-6 flex flex-col justify-between col-span-2 border border-solid border-alabaster-100">
+            <p className="text-neutral-900 leading-relaxed">
+              "I’ve always loved dogs, but I can’t have one at home right now. PawBorrow gave me a chance to enjoy a walk and some playtime with Milo. I’m already looking forward to seeing him again!"
+            </p>
+            <div className="flex items-center justify-between mt-6">
+              <div className="flex items-center gap-3">
+                <img
+                  src=""
+                  className="w-9 h-9 rounded-full object-cover"
+                />
+                <div>
+                  <div className="text-sm font-medium text-neutral-900">
+                    Miguel Ocampo
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   );
 }
-
 
 function MobileApp() {
   return (
@@ -357,17 +476,15 @@ function MobileApp() {
         </div>
         <div className="flex flex-col">
           <h2 className="text-3xl xs:text-4xl lg:text-5xl font-bold">
-            Meet your {""}  
-            <span className="text-froly-400">
-              PawPal
-            </span>
-           {""} on mobile.
+            Meet your {""}
+            <span className="text-froly-400">PawPal</span>
+            {""} on mobile.
           </h2>
           <p className="text-background font-inter   text-sm sm:text-base font-normal mt-6 leading-5 sm:leading-7">
             Download our app for easy access to our pet companion services.
-            <br/>
+            <br />
             You can browse our adorable pawpals, book, and reserve.
-            <br/>
+            <br />
             Available both on Android and iOS.
           </p>
           <img
@@ -380,4 +497,3 @@ function MobileApp() {
     </section>
   );
 }
-

@@ -42,7 +42,7 @@ export default function Login() {
     setAuthError("");
 
     try {
-      await signInWithGoogle();
+      await signInWithGoogle("/");
     } catch (err) {
       setAuthError(
         err instanceof Error

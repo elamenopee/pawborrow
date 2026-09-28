@@ -10,7 +10,6 @@ import {
   User,
   ArrowRight,
   Mail,
-  KeyRound,
   Phone,
   X,
 } from "lucide-react";
@@ -77,9 +76,8 @@ export default function Profile() {
       <Navbar />
 
       <div className="w-full p-6">
-        <div className="mx-auto flex w-full max-w-[860px] flex-col gap-8">
+        <div className="mx-auto flex w-full max-w-215 flex-col gap-8">
 
-          {/* General */}
           <section className="flex flex-col gap-2">
             <div className="flex flex-col gap-0.5 pb-1">
               <div className="text-base font-medium">
@@ -93,7 +91,6 @@ export default function Profile() {
 
             <div className="flex w-full flex-col overflow-hidden rounded-lg border">
 
-              {/* Name */}
               <button
                 type="button"
                 onClick={() => setEditingField("name")}
@@ -122,7 +119,6 @@ export default function Profile() {
                 <ArrowRight className="h-6 w-6 text-gray-400" />
               </button>
 
-              {/* Email */}
               <div
                 className="
                   flex w-full items-center
@@ -145,7 +141,6 @@ export default function Profile() {
                 </div>
               </div>
 
-              {/* Phone */}
               <button
                 type="button"
                 onClick={() => setEditingField("phone")}
@@ -174,27 +169,7 @@ export default function Profile() {
                 <ArrowRight className="h-6 w-6 text-gray-400" />
               </button>
 
-              {/* Password */}
-              <button
-                type="button"
-                className="
-                  flex w-full items-center
-                  justify-between gap-4
-                  px-6 py-5
-                  text-left
-                  hover:bg-gray-50
-                "
-              >
-                <div className="flex flex-1 items-start gap-3">
-                  <KeyRound className="h-6 w-6 text-gray-400" />
-
-                  <div className="text-base font-medium">
-                    Password
-                  </div>
-                </div>
-
-                <ArrowRight className="h-6 w-6 text-gray-400" />
-              </button>
+          
 
             </div>
           </section>

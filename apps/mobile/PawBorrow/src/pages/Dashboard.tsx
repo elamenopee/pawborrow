@@ -2,13 +2,17 @@ import {
   useMemo,
   useState,
 } from "react";
+
 import {
   IonContent,
   IonPage,
   IonIcon,
 } from "@ionic/react";
+
 import { notificationsOutline } from "ionicons/icons";
+
 import { useNavigate } from "react-router-dom";
+
 import {
   useBookings,
   usePets,
@@ -16,8 +20,16 @@ import {
 
 import SearchBar from "../components/SearchBar";
 import NotificationBadge from "../components/NotificationBadge";
+
 import { matchesSearch } from "../../public/images/utils/search";
+
 import { useAuth } from "../context/AuthContext";
+
+import "../style/Dashboard.css";
+
+// ========================================
+// Default Images
+// ========================================
 
 const defaultAvatar =
   "/images/dashboard/avatar-sarah.png";
@@ -29,13 +41,13 @@ const catPhoto =
   "/images/dashboard/cat.png";
 
 const dogPhoto =
-  "/images/dashboard/dog.png";
+  "/images/pets/Dogs/Pug/Edgar.jpg";
 
 const rabbitPhoto =
-  "/images/dashboard/rabbit.png";
+  "/images/pets/Rabbits/Flemish/Maple.jpg";
 
 const capybaraPhoto =
-  "/images/dashboard/guinea-pig.png";
+  "/images/pets/Capybara/Less/Carlos.jpg";
 
 const bookNowPhoto =
   "/images/dashboard/book-now.png";
@@ -43,13 +55,12 @@ const bookNowPhoto =
 const communityPhoto =
   "/images/dashboard/community.png";
 
-const trainingCardPhoto =
-  "/images/dashboard/training-card.png";
-
 const fallbackImage =
   "/images/logo.png";
 
-import "../style/Dashboard.css";
+// ========================================
+// Category Images
+// ========================================
 
 const categoryImages: Record<
   string,
@@ -57,15 +68,23 @@ const categoryImages: Record<
 > = {
   cat: catPhoto,
   cats: catPhoto,
+
   dog: dogPhoto,
   dogs: dogPhoto,
+
   rabbit: rabbitPhoto,
   rabbits: rabbitPhoto,
+
   capybara: capybaraPhoto,
   capybaras: capybaraPhoto,
+
   "guinea pig": capybaraPhoto,
   "guinea pigs": capybaraPhoto,
 };
+
+// ========================================
+// Create URL Slug
+// ========================================
 
 function createSlug(value: string) {
   return value
@@ -75,6 +94,10 @@ function createSlug(value: string) {
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
 }
+
+// ========================================
+// Greeting
+// ========================================
 
 function getGreeting() {
   const hour = new Date().getHours();
@@ -90,12 +113,40 @@ function getGreeting() {
   return "Good Evening!";
 }
 
+// ========================================
+// Dashboard
+// ========================================
+
 export const Dashboard = () => {
   const navigate = useNavigate();
+
+  // ========================================
+  // Authenticated User
+  // ========================================
+  //
+  // `user` is already the profile loaded
+  // from the `user_profiles` table.
+  //
+  // Available properties:
+  //
+  // user.firstName
+  // user.lastName
+  // user.fullName
+  // user.avatarUrl
+  // user.email
+  //
+  // ========================================
+
   const { user } = useAuth();
 
-  const [searchTerm, setSearchTerm] =
-    useState("");
+  const [
+    searchTerm,
+    setSearchTerm,
+  ] = useState("");
+
+  // ========================================
+  // Pets
+  // ========================================
 
   const {
     data: pets = [],
@@ -103,10 +154,18 @@ export const Dashboard = () => {
     isError: petsError,
   } = usePets();
 
+  // ========================================
+  // Bookings
+  // ========================================
+
   const {
     data: bookings = [],
     isLoading: bookingsLoading,
   } = useBookings();
+
+  // ========================================
+  // Create Categories From Pets
+  // ========================================
 
   const categories = useMemo(() => {
     const categoryMap = new Map<
@@ -131,46 +190,73 @@ export const Dashboard = () => {
         categoryName.toLowerCase();
 
       const existing =
-        categoryMap.get(normalizedName);
+        categoryMap.get(
+          normalizedName,
+        );
 
+      // Category already exists
       if (existing) {
         existing.count += 1;
         return;
       }
 
-      categoryMap.set(normalizedName, {
-        id: createSlug(categoryName),
-        label: categoryName,
-        photo:
-          categoryImages[normalizedName] ??
-          pet.image ??
-          capybaraPhoto,
-        count: 1,
-      });
+      // New category
+      categoryMap.set(
+        normalizedName,
+        {
+          id: createSlug(
+            categoryName,
+          ),
+
+          label: categoryName,
+
+          photo:
+            categoryImages[
+              normalizedName
+            ] ??
+            pet.image ??
+            capybaraPhoto,
+
+          count: 1,
+        },
+      );
     });
 
     return Array.from(
       categoryMap.values(),
-    ).sort((first, second) =>
-      first.label.localeCompare(
-        second.label,
-      ),
+    ).sort(
+      (first, second) =>
+        first.label.localeCompare(
+          second.label,
+        ),
     );
   }, [pets]);
 
+  // ========================================
+  // Search Categories
+  // ========================================
+
   const filteredCategories =
-    categories.filter((category) =>
-      matchesSearch(
-        category.label,
-        searchTerm,
-      ),
+    categories.filter(
+      (category) =>
+        matchesSearch(
+          category.label,
+          searchTerm,
+        ),
     );
 
-  /*
-   * The booking API currently has no read/unread
-   * notification field. Show the number of pending
-   * and confirmed bookings as the badge count.
-   */
+  // ========================================
+  // Notification Count
+  // ========================================
+  //
+  // The booking API currently has no
+  // read/unread notification field.
+  //
+  // So we show pending + confirmed
+  // bookings as the badge count.
+  //
+  // ========================================
+
   const notificationCount =
     bookings.filter((booking) => {
       const status =
@@ -182,13 +268,42 @@ export const Dashboard = () => {
       );
     }).length;
 
+  // ========================================
+  // USER PROFILE
+  // ========================================
+  //
+  // Data comes from:
+  //
+  // public.user_profiles
+  //
+  // first_name
+  // last_name
+  // avatar_url
+  //
+  // AuthContext converts them into:
+  //
+  // firstName
+  // lastName
+  // avatarUrl
+  //
+  // ========================================
+
   const displayName =
-    user?.displayName ||
-    user?.firstName ||
+    [
+      user?.firstName,
+      user?.lastName,
+    ]
+      .filter(Boolean)
+      .join(" ") ||
     "PawBorrow User";
 
   const avatar =
-    user?.avatarUrl || defaultAvatar;
+    user?.avatarUrl ||
+    defaultAvatar;
+
+  // ========================================
+  // Render
+  // ========================================
 
   return (
     <IonPage>
@@ -197,8 +312,17 @@ export const Dashboard = () => {
         className="dashboard-content"
       >
         <div className="dashboard">
+
+          {/* ==================================
+              HEADER
+          ================================== */}
+
           <header className="dashboard-header">
+
+            {/* User Information */}
+
             <div className="dashboard-user">
+
               <button
                 type="button"
                 className="dashboard-avatar-btn"
@@ -210,11 +334,19 @@ export const Dashboard = () => {
                 <img
                   className="dashboard-avatar"
                   src={avatar}
-                  alt={displayName}
+                  alt={`${displayName}'s profile`}
+                  onError={(event) => {
+                    event.currentTarget.onerror =
+                      null;
+
+                    event.currentTarget.src =
+                      defaultAvatar;
+                  }}
                 />
               </button>
 
               <div>
+
                 <p className="dashboard-greeting">
                   Hello, {displayName}
                 </p>
@@ -222,29 +354,46 @@ export const Dashboard = () => {
                 <p className="dashboard-subgreeting">
                   {getGreeting()}
                 </p>
+
               </div>
+
             </div>
+
+            {/* Notifications */}
 
             <button
               type="button"
               className="dashboard-icon-btn"
               aria-label="Notifications"
               onClick={() =>
-                navigate("/notification")
+                navigate(
+                  "/notification",
+                )
               }
             >
               <div className="dashboard-icon-wrap">
+
                 <IonIcon
-                  icon={notificationsOutline}
+                  icon={
+                    notificationsOutline
+                  }
                 />
 
                 <NotificationBadge
-                  count={notificationCount}
+                  count={
+                    notificationCount
+                  }
                   ariaLabel="Booking notifications"
                 />
+
               </div>
             </button>
+
           </header>
+
+          {/* ==================================
+              SEARCH
+          ================================== */}
 
           <SearchBar
             value={searchTerm}
@@ -252,8 +401,14 @@ export const Dashboard = () => {
             placeholder="Search pet categories"
           />
 
+          {/* ==================================
+              PROMO BANNER
+          ================================== */}
+
           <div className="dashboard-promo">
+
             <div className="dashboard-promo-text">
+
               <p className="dashboard-promo-title">
                 In Love with Pets?
               </p>
@@ -262,6 +417,7 @@ export const Dashboard = () => {
                 Find a companion to borrow
                 today.
               </p>
+
             </div>
 
             <img
@@ -269,32 +425,53 @@ export const Dashboard = () => {
               src={petsBanner}
               alt="Pets"
             />
+
           </div>
 
+          {/* ==================================
+              CATEGORY
+          ================================== */}
+
           <section className="dashboard-section">
+
             <div className="dashboard-section-header">
-              <h2>Category</h2>
+
+              <h2>
+                Category
+              </h2>
 
               <button
                 type="button"
                 className="dashboard-see-all"
                 onClick={() =>
-                  navigate("/pet-category")
+                  navigate(
+                    "/pet-category",
+                  )
                 }
               >
                 See All
               </button>
+
             </div>
 
+            {/* Loading */}
+
             {petsLoading && (
-              <p>Loading pet categories...</p>
+              <p>
+                Loading pet categories...
+              </p>
             )}
+
+            {/* Error */}
 
             {petsError && (
               <p>
-                Failed to load pet categories.
+                Failed to load pet
+                categories.
               </p>
             )}
+
+            {/* No Categories */}
 
             {!petsLoading &&
               !petsError &&
@@ -305,11 +482,14 @@ export const Dashboard = () => {
                 </p>
               )}
 
+            {/* Categories */}
+
             {!petsLoading &&
               !petsError &&
               filteredCategories.length >
                 0 && (
                 <div className="dashboard-categories">
+
                   {filteredCategories.map(
                     (category) => (
                       <button
@@ -322,65 +502,114 @@ export const Dashboard = () => {
                           )
                         }
                       >
+
                         <img
-                          src={category.photo}
-                          alt={category.label}
+                          src={
+                            category.photo ||
+                            fallbackImage
+                          }
+                          alt={
+                            category.label
+                          }
+                          onError={(
+                            event,
+                          ) => {
+                            event.currentTarget.onerror =
+                              null;
+
+                            event.currentTarget.src =
+                              fallbackImage;
+                          }}
                         />
 
                         <span>
-                          {category.label}
+                          {
+                            category.label
+                          }
                         </span>
 
                         <small>
-                          {category.count}{" "}
-                          {category.count === 1
+                          {
+                            category.count
+                          }{" "}
+                          {category.count ===
+                          1
                             ? "pet"
                             : "pets"}
                         </small>
+
                       </button>
                     ),
                   )}
+
                 </div>
               )}
+
           </section>
 
+          {/* ==================================
+              BOOK NOW
+          ================================== */}
+
           <section className="dashboard-section">
-            <h2>Book Now</h2>
+
+            <h2>
+              Book Now
+            </h2>
 
             <div className="dashboard-card">
+
               <div className="dashboard-card-text">
+
                 <p>
-                  Find an available companion
-                  and create a booking.
+                  Find an available
+                  companion and create
+                  a booking.
                 </p>
 
                 <button
                   type="button"
                   className="dashboard-card-btn"
                   onClick={() =>
-                    navigate("/pet-category")
+                    navigate(
+                      "/pet-category",
+                    )
                   }
                 >
                   See Pets
                 </button>
+
               </div>
 
               <img
                 src={bookNowPhoto}
                 alt="Book a pet"
               />
+
             </div>
+
           </section>
 
+          {/* ==================================
+              MY BOOKINGS
+          ================================== */}
+
           <section className="dashboard-section">
-            <h2>My Bookings</h2>
+
+            <h2>
+              My Bookings
+            </h2>
 
             <div className="dashboard-card">
+
               <div className="dashboard-card-text">
+
                 <p>
                   {bookingsLoading
                     ? "Loading your bookings..."
-                    : `You have ${bookings.length} ${
+                    : `You have ${
+                        bookings.length
+                      } ${
                         bookings.length ===
                         1
                           ? "booking"
@@ -392,76 +621,68 @@ export const Dashboard = () => {
                   type="button"
                   className="dashboard-card-btn"
                   onClick={() =>
-                    navigate("/my-bookings")
+                    navigate(
+                      "/my-bookings",
+                    )
                   }
                 >
                   View Bookings
                 </button>
+
               </div>
 
               <img
                 src={communityPhoto}
                 alt="My bookings"
               />
+
             </div>
+
           </section>
 
+          {/* ==================================
+              ABOUT US
+          ================================== */}
+
           <section className="dashboard-section">
-            <h2>About Us</h2>
+
+            <h2>
+              About Us
+            </h2>
 
             <div className="dashboard-card">
+
               <div className="dashboard-card-text">
+
                 <p>
                   Meet the team behind
-                  PawBorrow and our pet-first
-                  mission.
+                  PawBorrow and our
+                  pet-first mission.
                 </p>
 
                 <button
                   type="button"
                   className="dashboard-card-btn"
                   onClick={() =>
-                    navigate("/about-us")
+                    navigate(
+                      "/about-us",
+                    )
                   }
                 >
                   See More
                 </button>
+
               </div>
 
               <img
                 src={communityPhoto}
                 alt="About us"
               />
+
             </div>
+
           </section>
 
-          <section className="dashboard-section">
-            <h2>Training</h2>
-
-            <div className="dashboard-card">
-              <div className="dashboard-card-text">
-                <p>
-                  Learn to train your pet from
-                  the pros!
-                </p>
-
-                <button
-                  type="button"
-                  className="dashboard-card-btn"
-                  onClick={() =>
-                    navigate("/training")
-                  }
-                >
-                  See More
-                </button>
-              </div>
-
-              <img
-                src={trainingCardPhoto}
-                alt="Training"
-              />
-            </div>
-          </section>
         </div>
       </IonContent>
     </IonPage>

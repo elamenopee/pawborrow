@@ -1,13 +1,6 @@
-import {
-  useState,
-  type FormEvent,
-} from "react";
+import { useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  IonContent,
-  IonPage,
-  IonIcon,
-} from "@ionic/react";
+import { IonContent, IonPage, IonIcon } from "@ionic/react";
 import {
   eyeOutline,
   eyeOffOutline,
@@ -17,37 +10,45 @@ import {
 } from "ionicons/icons";
 
 import { useAuth } from "../context/AuthContext";
-import { signInWithGoogle } from "@repo/api";
-import logo from "/images/logo.png";
-import "../style/Login.css";
+import {
+  signInWithGoogleMobile as signInWithGoogle,
+} from "../utils/mobileAuth";
 
-const Login: React.FC = () => {
+function getErrorMessage(error: unknown, fallback: string): string {
+  if (
+    typeof error === "object" &&
+    error !== null &&
+    "message" in error &&
+    typeof error.message === "string"
+  ) {
+    return error.message;
+  }
+
+  return fallback;
+}
+
+export default function Login() {
   const navigate = useNavigate();
   const { login } = useAuth();
 
   const [email, setEmail] = useState("");
-  const [password, setPassword] =
-    useState("");
-  const [showPassword, setShowPassword] =
-    useState(false);
-  const [loading, setLoading] =
-    useState(false);
-  const [googleLoading, setGoogleLoading] =
-    useState(false);
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState("");
 
-  async function handleLogin(
-    event: FormEvent<HTMLFormElement>,
-  ) {
+  const isBusy = loading || googleLoading;
+
+  async function handleLogin(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    const normalizedEmail =
-      email.trim().toLowerCase();
+    if (isBusy) return;
+
+    const normalizedEmail = email.trim().toLowerCase();
 
     if (!normalizedEmail || !password) {
-      setError(
-        "Please enter your email and password.",
-      );
+      setError("Please enter your email and password.");
       return;
     }
 
@@ -55,24 +56,14 @@ const Login: React.FC = () => {
     setLoading(true);
 
     try {
-      await login(
-        normalizedEmail,
-        password,
-      );
-
-      navigate("/dashboard", {
-        replace: true,
-      });
+      await login(normalizedEmail, password);
+      navigate("/dashboard", { replace: true });
     } catch (loginError) {
-      console.error(
-        "Login failed:",
-        loginError,
-      );
-
       setError(
-        loginError instanceof Error
-          ? loginError.message
-          : "Incorrect email or password.",
+        getErrorMessage(
+          loginError,
+          "Unable to sign in. Please check your email and password.",
+        ),
       );
     } finally {
       setLoading(false);
@@ -80,109 +71,88 @@ const Login: React.FC = () => {
   }
 
   async function handleGoogleLogin() {
+    if (isBusy) return;
+
     setError("");
     setGoogleLoading(true);
 
     try {
-      /*
-       * Supabase opens the Google login page.
-       * Do not navigate manually here because
-       * Google redirects the user afterward.
-       */
+      // The shared authentication function starts the OAuth redirect.
       await signInWithGoogle();
     } catch (googleError) {
-      console.error(
-        "Google login failed:",
-        googleError,
-      );
-
       setError(
-        googleError instanceof Error
-          ? googleError.message
-          : "Unable to sign in with Google.",
+        getErrorMessage(
+          googleError,
+          "Unable to sign in with Google.",
+        ),
       );
-
+    } finally {
       setGoogleLoading(false);
     }
   }
 
-  const isBusy =
-    loading || googleLoading;
-
   return (
     <IonPage>
-      <IonContent
-        fullscreen
-        className="login-content"
-      >
-        <form
-          className="login-wrap"
-          onSubmit={handleLogin}
-        >
-          <h1 className="login-title">
-            Login
-          </h1>
+      <IonContent fullscreen className="login-content">
+        <form className="login-wrap" onSubmit={handleLogin}>
+          <h1 className="login-title">Login</h1>
 
           <img
             className="login-logo"
-            src={logo}
+            src="/images/logo.png"
             alt="PawBorrow logo"
           />
 
           <div className="login-field">
-            <label htmlFor="email">
-              Email
-            </label>
+            <label htmlFor="login-email">Email</label>
 
             <div className="login-input-wrap">
               <IonIcon
                 icon={mailOutline}
                 className="login-input-icon"
+                aria-hidden="true"
               />
 
               <input
-                id="email"
+                id="login-email"
+                name="email"
                 type="email"
                 autoComplete="email"
+                autoCapitalize="none"
+                spellCheck={false}
                 placeholder="you@example.com"
                 value={email}
                 onChange={(event) => {
-                  setEmail(
-                    event.target.value,
-                  );
+                  setEmail(event.target.value);
                   setError("");
                 }}
+                required
                 disabled={isBusy}
               />
             </div>
 
             <div className="outer-login-password-wrap">
-              <label htmlFor="password">
-                Password
-              </label>
+              <label htmlFor="login-password">Password</label>
 
               <div className="login-password-wrap">
                 <IonIcon
                   icon={lockClosedOutline}
                   className="login-input-icon"
+                  aria-hidden="true"
                 />
 
                 <input
-                  id="password"
-                  type={
-                    showPassword
-                      ? "text"
-                      : "password"
-                  }
+                  id="login-password"
+                  name="password"
+                  type={showPassword ? "text" : "password"}
                   autoComplete="current-password"
-                  placeholder="••••••••"
+                  placeholder="Enter your password"
                   value={password}
                   onChange={(event) => {
-                    setPassword(
-                      event.target.value,
-                    );
+                    setPassword(event.target.value);
                     setError("");
                   }}
+                  required
                   disabled={isBusy}
                 />
 
@@ -190,23 +160,15 @@ const Login: React.FC = () => {
                   type="button"
                   className="login-password-toggle"
                   aria-label={
-                    showPassword
-                      ? "Hide password"
-                      : "Show password"
+                    showPassword ? "Hide password" : "Show password"
                   }
-                  onClick={() =>
-                    setShowPassword(
-                      (current) => !current,
-                    )
-                  }
+                  aria-pressed={showPassword}
+                  onClick={() => setShowPassword((current) => !current)}
                   disabled={isBusy}
                 >
                   <IonIcon
-                    icon={
-                      showPassword
-                        ? eyeOffOutline
-                        : eyeOutline
-                    }
+                    icon={showPassword ? eyeOffOutline : eyeOutline}
+                    aria-hidden="true"
                   />
                 </button>
               </div>
@@ -214,10 +176,7 @@ const Login: React.FC = () => {
           </div>
 
           {error && (
-            <p
-              className="login-error"
-              role="alert"
-            >
+            <p className="login-error" role="alert">
               {error}
             </p>
           )}
@@ -243,10 +202,20 @@ const Login: React.FC = () => {
             className="login-btn"
             disabled={isBusy}
           >
-            {loading
-              ? "LOGGING IN..."
-              : "LOGIN"}
+            {loading ? "LOGGING IN..." : "LOGIN"}
           </button>
+
+          <p className="login-footer">
+            Don&apos;t have an account?{" "}
+            <button
+              type="button"
+              className="login-terms-link"
+              onClick={() => navigate("/signup")}
+              disabled={isBusy}
+            >
+              Sign Up
+            </button>
+          </p>
 
           <div className="login-divider">
             <span>OR</span>
@@ -258,12 +227,9 @@ const Login: React.FC = () => {
             onClick={handleGoogleLogin}
             disabled={isBusy}
           >
-            <IonIcon icon={logoGoogle} />
-
+            <IonIcon icon={logoGoogle} aria-hidden="true" />
             <span>
-              {googleLoading
-                ? "CONNECTING..."
-                : "CONTINUE WITH GOOGLE"}
+              {googleLoading ? "CONNECTING..." : "CONTINUE WITH GOOGLE"}
             </span>
           </button>
 
@@ -281,18 +247,13 @@ const Login: React.FC = () => {
           </p>
 
           <p className="login-footer">
-            By continuing, you agree to
-            our
+            By continuing, you agree to our
             <br />
 
             <button
               type="button"
               className="login-terms-link"
-              onClick={() =>
-                navigate(
-                  "/terms-of-service",
-                )
-              }
+              onClick={() => navigate("/terms-of-service")}
               disabled={isBusy}
             >
               Terms of Service
@@ -303,11 +264,7 @@ const Login: React.FC = () => {
             <button
               type="button"
               className="login-terms-link"
-              onClick={() =>
-                navigate(
-                  "/privacy-policy",
-                )
-              }
+              onClick={() => navigate("/privacy-policy")}
               disabled={isBusy}
             >
               Privacy Policy
@@ -317,6 +274,4 @@ const Login: React.FC = () => {
       </IonContent>
     </IonPage>
   );
-};
-
-export default Login;
+}

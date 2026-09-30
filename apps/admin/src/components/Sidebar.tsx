@@ -1,4 +1,4 @@
-import { LayoutDashboard, Users, CalendarClock, Boxes, PawPrint, ClipboardList, Star, ChevronLeft } from 'lucide-react';
+import { LayoutDashboard, Users, CalendarClock, PawPrint, Star, ChevronLeft } from 'lucide-react';
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 

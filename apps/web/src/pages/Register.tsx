@@ -29,7 +29,8 @@ export default function Register() {
         data.email,
         data.password,
         data.firstName,
-        data.lastName
+        data.lastName,
+        "/"
       );
 
       navigate("/login");

@@ -5,33 +5,69 @@ import {
   useState,
   type ReactNode,
 } from "react";
+
 import { supabase } from "@repo/api";
-import type {
-  Session,
-  User,
-} from "@supabase/supabase-js";
+
+// ========================================
+// Authentication User
+// ========================================
+
+type AuthUser = {
+  id: string;
+  email?: string | null;
+  created_at: string;
+};
+
+// ========================================
+// Session
+// ========================================
+
+type Session = {
+  user: AuthUser;
+};
+
+// ========================================
+// User Profile
+// ========================================
 
 export interface UserProfile {
   id: string;
+
   email: string;
+
   displayName: string;
+
   fullName: string;
+
   firstName: string;
+
   lastName: string;
+
   phoneNumber: string;
+
   accountCreated: string;
+
   avatarUrl?: string;
 }
 
+// ========================================
+// Auth Context
+// ========================================
+
 interface AuthContextValue {
   isLoggedIn: boolean;
+
   loading: boolean;
+
   user: UserProfile | null;
+
   session: Session | null;
+
   login: (
     email: string,
     password: string,
   ) => Promise<void>;
+
   logout: () => Promise<void>;
 }
 
@@ -40,10 +76,28 @@ const AuthContext =
     undefined,
   );
 
+// ========================================
+// Load User Profile
+// ========================================
+//
+// Gets the authenticated user's profile
+// from public.user_profiles.
+//
+// Relationship:
+//
+// auth.users.id
+//      ↓
+// user_profiles.id
+//
+// ========================================
+
 async function loadUserProfile(
-  authUser: User,
+  authUser: AuthUser,
 ): Promise<UserProfile> {
-  const { data, error } = await supabase
+  const {
+    data,
+    error,
+  } = await supabase
     .from("user_profiles")
     .select(`
       id,
@@ -64,11 +118,19 @@ async function loadUserProfile(
     );
   }
 
+  // ========================================
+  // Basic User Information
+  // ========================================
+
   const firstName =
     data?.first_name ?? "";
 
   const lastName =
     data?.last_name ?? "";
+
+  // ========================================
+  // Full Name
+  // ========================================
 
   const fullName =
     [firstName, lastName]
@@ -77,9 +139,17 @@ async function loadUserProfile(
     authUser.email ||
     "Account";
 
+  // ========================================
+  // Account Created
+  // ========================================
+
   const createdAt =
     data?.created_at ??
     authUser.created_at;
+
+  // ========================================
+  // Return Profile
+  // ========================================
 
   return {
     id: authUser.id,
@@ -90,7 +160,8 @@ async function loadUserProfile(
       "",
 
     displayName:
-      firstName || fullName,
+      firstName ||
+      fullName,
 
     fullName,
 
@@ -102,18 +173,26 @@ async function loadUserProfile(
       data?.phone ?? "",
 
     avatarUrl:
-      data?.avatar_url ?? undefined,
+      data?.avatar_url ??
+      undefined,
 
     accountCreated: createdAt
       ? new Date(
           createdAt,
-        ).toLocaleDateString("en-US", {
-          month: "long",
-          year: "numeric",
-        })
+        ).toLocaleDateString(
+          "en-US",
+          {
+            month: "long",
+            year: "numeric",
+          },
+        )
       : "",
   };
 }
+
+// ========================================
+// Auth Provider
+// ========================================
 
 export const AuthProvider = ({
   children,
@@ -129,6 +208,10 @@ export const AuthProvider = ({
   const [loading, setLoading] =
     useState(true);
 
+  // ========================================
+  // Apply Session
+  // ========================================
+
   useEffect(() => {
     let active = true;
 
@@ -139,13 +222,23 @@ export const AuthProvider = ({
         return;
       }
 
+      // Store session
       setSession(nextSession);
+
+      // ======================================
+      // No Session
+      // ======================================
 
       if (!nextSession?.user) {
         setUser(null);
         setLoading(false);
+
         return;
       }
+
+      // ======================================
+      // Load Profile
+      // ======================================
 
       try {
         const profile =
@@ -172,6 +265,10 @@ export const AuthProvider = ({
       }
     }
 
+    // ========================================
+    // Initialize Authentication
+    // ========================================
+
     async function initializeAuth() {
       setLoading(true);
 
@@ -186,7 +283,9 @@ export const AuthProvider = ({
           throw error;
         }
 
-        await applySession(data.session);
+        await applySession(
+          data.session,
+        );
       } catch (error) {
         console.error(
           "Failed to restore Supabase session:",
@@ -203,8 +302,14 @@ export const AuthProvider = ({
 
     initializeAuth();
 
+    // ========================================
+    // Listen For Authentication Changes
+    // ========================================
+
     const {
-      data: { subscription },
+      data: {
+        subscription,
+      },
     } =
       supabase.auth.onAuthStateChange(
         (_event, nextSession) => {
@@ -215,20 +320,34 @@ export const AuthProvider = ({
           setLoading(true);
 
           /*
-           * Run profile loading after the auth callback
-           * finishes to avoid blocking Supabase auth.
+           * Run profile loading after the
+           * auth callback finishes.
+           *
+           * This avoids making another Supabase
+           * request directly inside the callback.
            */
           window.setTimeout(() => {
-            applySession(nextSession);
+            applySession(
+              nextSession,
+            );
           }, 0);
         },
       );
 
+    // ========================================
+    // Cleanup
+    // ========================================
+
     return () => {
       active = false;
+
       subscription.unsubscribe();
     };
   }, []);
+
+  // ========================================
+  // Login
+  // ========================================
 
   async function login(
     email: string,
@@ -249,19 +368,36 @@ export const AuthProvider = ({
       );
     }
 
-    const { error } =
-      await supabase.auth.signInWithPassword({
-        email: normalizedEmail,
-        password,
-      });
+    const {
+      error,
+    } =
+      await supabase.auth.signInWithPassword(
+        {
+          email: normalizedEmail,
+          password,
+        },
+      );
 
     if (error) {
       throw error;
     }
+
+    /*
+     * We don't manually set user here.
+     *
+     * Supabase will trigger onAuthStateChange(),
+     * which will load the user_profiles row.
+     */
   }
 
+  // ========================================
+  // Logout
+  // ========================================
+
   async function logout() {
-    const { error } =
+    const {
+      error,
+    } =
       await supabase.auth.signOut();
 
     if (error) {
@@ -269,18 +405,30 @@ export const AuthProvider = ({
     }
 
     setSession(null);
+
     setUser(null);
+
     setLoading(false);
   }
+
+  // ========================================
+  // Provider
+  // ========================================
 
   return (
     <AuthContext.Provider
       value={{
-        isLoggedIn: Boolean(session),
+        isLoggedIn:
+          Boolean(session),
+
         loading,
+
         user,
+
         session,
+
         login,
+
         logout,
       }}
     >
@@ -288,6 +436,10 @@ export const AuthProvider = ({
     </AuthContext.Provider>
   );
 };
+
+// ========================================
+// useAuth
+// ========================================
 
 export const useAuth = () => {
   const context =

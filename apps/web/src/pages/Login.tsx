@@ -42,7 +42,7 @@ export default function Login() {
     setAuthError("");
 
     try {
-      await signInWithGoogle();
+      await signInWithGoogle("/");
     } catch (err) {
       setAuthError(
         err instanceof Error
@@ -84,12 +84,9 @@ export default function Login() {
               </div>
 
               <div className="relative flex h-full flex-col justify-end p-12">
-                <span className="font-serif text-[32px] font-normal">
-                  PawBorrow
-                </span>
 
                 <p className="mt-2 text-base">
-                  You've got a Paw in me
+                  You've got a friend in me
                 </p>
               </div>
             </div>

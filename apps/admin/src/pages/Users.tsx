@@ -1,3 +1,4 @@
+import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import {
   ChevronDown,
@@ -73,6 +74,7 @@ async function runAdminUserAction(body: AdminUserAction) {
 }
 
 export default function Users() {
+  const queryClient = useQueryClient();
   const {
     data: users = [],
     isLoading,
@@ -203,6 +205,7 @@ export default function Users() {
         throw new Error("The user was not updated.");
       }
 
+      await queryClient.invalidateQueries({ queryKey: ["admin-dashboard"] });
       await refetch();
       setEditingUser(null);
     } catch (cause) {
@@ -242,6 +245,7 @@ export default function Users() {
         return next;
       });
 
+      await queryClient.invalidateQueries({ queryKey: ["admin-dashboard"] });
       await refetch();
     } catch (cause) {
       setActionError(

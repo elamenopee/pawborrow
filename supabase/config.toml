@@ -1,0 +1,4 @@
+# This function validates the user's bearer token with auth.getUser itself.
+# This also supports projects using publishable keys and asymmetric JWTs.
+[functions.admin-user-actions]
+verify_jwt = false

@@ -32,12 +32,8 @@ interface PaymentRecord {
 interface PetRecord {
   status: string;
   category:
-    | {
-        category_name: string;
-      }
-    | {
-        category_name: string;
-      }[]
+    | { category_name: string }
+    | { category_name: string }[]
     | null;
 }
 
@@ -51,36 +47,37 @@ const CATEGORY_COLORS = [
 ];
 
 function isSuccessfulPayment(status: string): boolean {
-  const normalizedStatus = status.toLowerCase();
-
-  return [
-    "paid",
-    "completed",
-    "successful",
-    "success",
-  ].includes(normalizedStatus);
+  return ["paid", "completed", "successful", "success"].includes(
+    status.trim().toLowerCase(),
+  );
 }
 
-function formatCurrencyDate(date: Date): string {
-  return date.toLocaleDateString("en-US", {
+function getAmount(value: number | string): number {
+  const amount = Number(value);
+  return Number.isFinite(amount) ? amount : 0;
+}
+
+// Philippine time is UTC+8.
+function getPhilippineDateKey(date: Date): string {
+  return new Date(date.getTime() + 8 * 60 * 60 * 1000)
+    .toISOString()
+    .slice(0, 10);
+}
+
+function formatDateKey(key: string): string {
+  return new Date(`${key}T00:00:00Z`).toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
+    timeZone: "UTC",
   });
 }
 
 export async function getDashboardData(): Promise<DashboardData> {
-  const today = new Date();
-  const startDate = new Date();
-
-  startDate.setDate(today.getDate() - 6);
-  startDate.setHours(0, 0, 0, 0);
-
   const [
     usersResult,
     bookingsResult,
     petsResult,
-    bookingPaymentsResult,
-    productPaymentsResult,
+    paymentsResult,
   ] = await Promise.all([
     supabase
       .from("user_profiles")
@@ -114,128 +111,93 @@ export async function getDashboardData(): Promise<DashboardData> {
         payment_status,
         transaction_date
       `),
-
-    supabase
-      .from("product_payment")
-      .select(`
-        amount,
-        payment_status,
-        transaction_date
-      `),
   ]);
 
   if (usersResult.error) throw usersResult.error;
   if (bookingsResult.error) throw bookingsResult.error;
   if (petsResult.error) throw petsResult.error;
-  if (bookingPaymentsResult.error) {
-    throw bookingPaymentsResult.error;
-  }
-  if (productPaymentsResult.error) {
-    throw productPaymentsResult.error;
-  }
+  if (paymentsResult.error) throw paymentsResult.error;
 
-  const pets =
-    (petsResult.data ?? []) as unknown as PetRecord[];
+  const pets = (petsResult.data ?? []) as unknown as PetRecord[];
 
-  const bookingPayments =
-    (bookingPaymentsResult.data ??
-      []) as unknown as PaymentRecord[];
+  const payments = (paymentsResult.data ?? []) as PaymentRecord[];
 
-  const productPayments =
-    (productPaymentsResult.data ??
-      []) as unknown as PaymentRecord[];
-
-  const successfulPayments = [
-    ...bookingPayments,
-    ...productPayments,
-  ].filter((payment) =>
+  const successfulPayments = payments.filter((payment) =>
     isSuccessfulPayment(payment.payment_status),
   );
 
   const totalSales = successfulPayments.reduce(
-    (sum, payment) => sum + Number(payment.amount),
+    (sum, payment) => sum + getAmount(payment.amount),
     0,
   );
 
+  // Create seven date buckets, ending with today in Philippine time.
+  const todayKey = getPhilippineDateKey(new Date());
+  const today = new Date(`${todayKey}T00:00:00Z`);
   const salesByDate = new Map<string, number>();
 
-  for (let offset = 0; offset < 7; offset += 1) {
-    const date = new Date(startDate);
+  for (let daysAgo = 6; daysAgo >= 0; daysAgo -= 1) {
+    const date = new Date(today);
+    date.setUTCDate(today.getUTCDate() - daysAgo);
 
-    date.setDate(startDate.getDate() + offset);
-
-    const key = date.toISOString().slice(0, 10);
-
-    salesByDate.set(key, 0);
+    salesByDate.set(date.toISOString().slice(0, 10), 0);
   }
 
-  successfulPayments.forEach((payment) => {
-    const paymentDate = new Date(
-      payment.transaction_date,
-    );
+  for (const payment of successfulPayments) {
+    const paymentDate = new Date(payment.transaction_date);
 
-    if (
-      Number.isNaN(paymentDate.getTime()) ||
-      paymentDate < startDate
-    ) {
-      return;
-    }
+    if (Number.isNaN(paymentDate.getTime())) continue;
 
-    const key = paymentDate.toISOString().slice(0, 10);
+    const key = getPhilippineDateKey(paymentDate);
 
-    if (!salesByDate.has(key)) return;
+    if (!salesByDate.has(key)) continue;
 
     salesByDate.set(
       key,
-      (salesByDate.get(key) ?? 0) +
-        Number(payment.amount),
+      (salesByDate.get(key) ?? 0) + getAmount(payment.amount),
     );
-  });
+  }
 
-  const dailySales = Array.from(
+  const dailySales: DailySale[] = Array.from(
     salesByDate.entries(),
-  ).map(([date, sales]) => ({
-    day: formatCurrencyDate(
-      new Date(`${date}T00:00:00`),
-    ),
-    sales,
-  }));
+    ([date, sales]) => ({
+      day: formatDateKey(date),
+      sales,
+    }),
+  );
 
   const availablePets = pets.filter(
-    (pet) =>
-      pet.status.toLowerCase() === "available",
+    (pet) => pet.status.toLowerCase() === "available",
   );
 
   const categoryCounts = new Map<string, number>();
 
-  availablePets.forEach((pet) => {
-    const categoryRelation = Array.isArray(pet.category)
+  for (const pet of availablePets) {
+    const category = Array.isArray(pet.category)
       ? pet.category[0]
       : pet.category;
 
-    const categoryName =
-      categoryRelation?.category_name ?? "Uncategorized";
+    const name = category?.category_name ?? "Uncategorized";
 
-    categoryCounts.set(
-      categoryName,
-      (categoryCounts.get(categoryName) ?? 0) + 1,
-    );
-  });
+    categoryCounts.set(name, (categoryCounts.get(name) ?? 0) + 1);
+  }
 
   const availablePetCount = availablePets.length;
 
-  const petBreakdown = Array.from(
+  const petBreakdown: PetCategoryBreakdown[] = Array.from(
     categoryCounts.entries(),
-  ).map(([name, value], index) => ({
-    name,
-    value,
-    percentage:
-      availablePetCount > 0
-        ? Math.round((value / availablePetCount) * 100)
-        : 0,
-    fill:
-      CATEGORY_COLORS[index % CATEGORY_COLORS.length],
-  }));
+    ([name, value], index) => ({
+      name,
+      value,
+      percentage:
+        availablePetCount > 0
+          ? Math.round((value / availablePetCount) * 100)
+          : 0,
+      fill: CATEGORY_COLORS[index % CATEGORY_COLORS.length],
+    }),
+  );
+
+  const dateKeys = Array.from(salesByDate.keys());
 
   return {
     visitors: usersResult.count ?? 0,
@@ -244,9 +206,8 @@ export async function getDashboardData(): Promise<DashboardData> {
     pets: pets.length,
     availablePets: availablePetCount,
     dailySales,
-    salesDateRange: `${formatCurrencyDate(
-      startDate,
-    )} – ${formatCurrencyDate(today)}`,
+    salesDateRange:
+      `${formatDateKey(dateKeys[0])} – ${formatDateKey(todayKey)}`,
     petBreakdown,
   };
 }

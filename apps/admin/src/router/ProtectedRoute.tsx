@@ -25,7 +25,7 @@ export default function ProtectedRoute() {
     );
   }
 
-  if (profile?.role !== "admin") {
+  if (profile?.role !== "admin" || !profile.is_active) {
     return <Navigate to="/unauthorized" replace />;
   }
 
